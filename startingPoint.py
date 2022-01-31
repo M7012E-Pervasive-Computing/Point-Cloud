@@ -1,3 +1,6 @@
+# run pip install numpy
+# run pip install pyvista
+# python version - 3.9.10
 import numpy as np
 
 import pyvista as pv
