@@ -1,6 +1,7 @@
 # run pip install numpy
 # run pip install pyvista
 # python version - 3.9.10
+# https://docs.pyvista.org/examples/00-load/create-point-cloud.html
 import numpy as np
 
 import pyvista as pv
