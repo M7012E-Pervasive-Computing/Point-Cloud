@@ -6,8 +6,10 @@ name = "pypi"
 [packages]
 flask = "*"
 numpy = "*"
+vtk = "*"
+pyvista = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.10"
+python_version = "3.9"
