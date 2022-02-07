@@ -1,9 +1,7 @@
 # examples/python/visualization/non_blocking_visualization.py
 
-from time import sleep
 import open3d as o3d
 import numpy as np
-import copy
 
 class test:
 
