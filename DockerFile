@@ -33,7 +33,9 @@ USER appuser
 # Install application into container
 COPY . .
 
-# Run the application
+#! Run the application
 # ENTRYPOINT ["python", "-m", "http.server"]
 # CMD ["--directory", "directory", "8000"]
+
+# localhost:5000
 CMD [ "python3", "-m", "flask", "run", "--host.0.0.0.0"]
