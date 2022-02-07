@@ -8,6 +8,7 @@ flask = "*"
 numpy = "*"
 vtk = "*"
 pyvista = "*"
+flask-restful = "*"
 open3d = "*"
 
 [dev-packages]
