@@ -1,13 +1,13 @@
 # examples/python/visualization/non_blocking_visualization.py
 
-import open3d as o3d
+from open3d import utility, io, visualization, pipelines
 import numpy as np
 import copy
 
 if __name__ == "__main__":
-    o3d.utility.set_verbosity_level(o3d.utility.VerbosityLevel.Debug)
-    source_raw = o3d.io.read_point_cloud("../../test_data/ICP/cloud_bin_0.pcd")
-    target_raw = o3d.io.read_point_cloud("../../test_data/ICP/cloud_bin_1.pcd")
+    utility.set_verbosity_level(utility.VerbosityLevel.Debug)
+    source_raw = io.read_point_cloud("../../test_data/ICP/cloud_bin_0.pcd")
+    target_raw = io.read_point_cloud("../../test_data/ICP/cloud_bin_1.pcd")
     source = source_raw.voxel_down_sample(voxel_size=0.02)
     target = target_raw.voxel_down_sample(voxel_size=0.02)
     trans = [[0.862, 0.011, -0.507, 0.0], [-0.139, 0.967, -0.215, 0.7],
@@ -18,7 +18,7 @@ if __name__ == "__main__":
     source.transform(flip_transform)
     target.transform(flip_transform)
 
-    vis = o3d.visualization.Visualizer()
+    vis = visualization.Visualizer()
     vis.create_window()
     vis.add_geometry(source)
     vis.add_geometry(target)
@@ -27,10 +27,10 @@ if __name__ == "__main__":
     save_image = False
 
     for i in range(icp_iteration):
-        reg_p2l = o3d.pipelines.registration.registration_icp(
+        reg_p2l = pipelines.registration.registration_icp(
             source, target, threshold, np.identity(4),
-            o3d.pipelines.registration.TransformationEstimationPointToPlane(),
-            o3d.pipelines.registration.ICPConvergenceCriteria(max_iteration=1))
+            pipelines.registration.TransformationEstimationPointToPlane(),
+            pipelines.registration.ICPConvergenceCriteria(max_iteration=1))
         source.transform(reg_p2l.transformation)
         vis.update_geometry(source)
         vis.poll_events()

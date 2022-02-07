@@ -1,15 +1,15 @@
-import open3d as o3d
+from open3d import geometry, utility, visualization
 import numpy as np
 
 #Create two random points
 randomPoints = np.random.rand(2, 3)
 
-pointSet = o3d.geometry.PointCloud()
+pointSet = geometry.PointCloud()
 
-pointSet.points = o3d.utility.Vector3dVector(randomPoints)
+pointSet.points = utility.Vector3dVector(randomPoints)
 
 #Visualize the two random points
-o3d.visualization.draw_geometries([pointSet])
+visualization.draw_geometries([pointSet])
 
 #Here I want to add more points to the pointSet
 #This solution does not work effective
@@ -19,8 +19,8 @@ p1 = np.random.rand(3, 3)
 
 p2 = np.concatenate((pointSet.points, p1), axis=0)
 
-pointSet2 = o3d.geometry.PointCloud()
+pointSet2 = geometry.PointCloud()
 
-pointSet2.points = o3d.utility.Vector3dVector(p2)
+pointSet2.points = utility.Vector3dVector(p2)
 
-o3d.visualization.draw_geometries([pointSet2])
+visualization.draw_geometries([pointSet2])
