@@ -13,7 +13,13 @@ def generate_points(subset=0.02):
     dataset = examples.download_lidar()
     ids = np.random.randint(low=0, high=dataset.n_points-1,
                             size=int(dataset.n_points * subset))
-    return dataset.points[ids]
+    ids2=np.random.randint(low=dataset.n_points-4500, high=dataset.n_points-1,
+                            size=int(dataset.n_points * subset))
+
+    id_p=ids
+    np.append(id_p,ids2,axis=0)
+    print("Holaa")
+    return dataset.points[id_p]
 
 
 points = generate_points()
