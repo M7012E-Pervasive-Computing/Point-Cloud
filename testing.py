@@ -10,8 +10,10 @@ class test:
     pointSet= geometry.PointCloud()
 
     for i in range(2):
-        arr=np.random.rand(200, 3)
+        arr=np.random.rand(50, 3)
         plotting=np.concatenate((plotting,arr))
         print(plotting)
         pointSet.points = utility.Vector3dVector(plotting)
         visualization.draw_geometries([pointSet])
+
+    
