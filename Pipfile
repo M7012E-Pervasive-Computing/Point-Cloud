@@ -10,6 +10,7 @@ vtk = "*"
 pyvista = "*"
 flask-restful = "*"
 open3d = "*"
+requests = "*"
 
 [dev-packages]
 

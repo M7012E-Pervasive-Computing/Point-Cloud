@@ -5,16 +5,14 @@ from flask_restful import Api, Resource
 app = Flask(__name__)
 api = Api(app)
     
-class pointData(Resource):
-    pointList = [[]]
-    def __init__(self, pointList):
-        self.pointList = pointList
-    
+
+class HelloWorld(Resource):
     def get(self):
-        return {"points"}
+        return {"data": "Hello World"}
 
-api.add_resource(pointData, "/pointData")
+api.add_resource(HelloWorld, "/helloworld")
 
-if __name__ == "__app__":
+
+if __name__ == "__main__":
     app.run(debug=True)
 
