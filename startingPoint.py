@@ -18,7 +18,6 @@ def generate_points(subset=0.02):
 
     id_p=ids
     np.append(id_p,ids2,axis=0)
-    print("Holaa")
     return dataset.points[id_p]
 
 
