@@ -55,7 +55,8 @@ class PointHandler:
         
         
         # self.points = np.array([[0, 0, 0]])
-        self.points = np.random.rand(10,3)
+        # self.points = np.random.rand(10,3)
+        self.points = np.array([[p[i]["x"]/10, p[i]["y"]/10, p[i]["z"]/10] for i in range(len(p))])
         self.point_cloud = geometry.PointCloud()
         self.point_cloud.points = utility.Vector3dVector(self.points)
         
@@ -64,13 +65,18 @@ class PointHandler:
         self.vis.create_window(width=480, height=480)
         self.vis.add_geometry(self.point_cloud)
         
-        for i in range(len(p)):
-            self.points = np.concatenate((self.points, np.array([[p[i]["x"]/10, p[i]["y"]/10, p[i]["z"]/10]])))
+        # for i in range(len(p)):
+            # self.points = np.concatenate((self.points, np.array([[p[i]["x"]/10, p[i]["y"]/10, p[i]["z"]/10]])))
             # self.points = np.concatenate((self.points, np.random.rand(1,3)))
-            self.point_cloud.points = utility.Vector3dVector(self.points)
-            self.vis.update_geometry(self.point_cloud)
-            self.vis.poll_events()
-            self.vis.update_renderer()
+            # self.point_cloud.points = utility.Vector3dVector(self.points)
+            # self.vis.update_geometry(self.point_cloud)
+            # self.vis.poll_events()
+            # self.vis.update_renderer()
+            
+        self.point_cloud.points = utility.Vector3dVector(self.points)
+        self.vis.update_geometry(self.point_cloud)
+        self.vis.poll_events()
+        self.vis.update_renderer()
             
         self.vis.run()
         
