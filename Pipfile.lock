@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "28760e10dd1af4b747ad7d4e6d4c994bda5c93b33ff0238f6bf57c6ba02a5db4"
+            "sha256": "091e0085d90cfab8437eeb518324bf53453aef1e7cf4405ddfc3de96c6550bfc"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -173,16 +173,6 @@
             ],
             "markers": "python_version >= '3.6'",
             "version": "==4.0.2"
-        },
-        "asyncio": {
-            "hashes": [
-                "sha256:83360ff8bc97980e4ff25c964c7bd3923d333d177aa4f7fb736b019f26c7cb41",
-                "sha256:b62c9157d36187eca799c378e572c969f0da87cd5fc42ca372d92cdb06e7e1de",
-                "sha256:c46a87b48213d7464f22d9a497b9eef8c1928b68320a2fa94240f969f6fec08c",
-                "sha256:c4d18b22701821de07bd6aea8b53d21449ec0ec5680645e5317062ea21817d2d"
-            ],
-            "index": "pypi",
-            "version": "==3.4.3"
         },
         "attrs": {
             "hashes": [
@@ -1134,11 +1124,11 @@
         },
         "pyvista": {
             "hashes": [
-                "sha256:5405428f4e9024263067924ec1163b3ba7bdb45cf1a802f217a55402d85df019",
-                "sha256:e0b70180ff6d943c015ff2cdf2fd85550ae941e9e68162d1f54219458707d5e2"
+                "sha256:3477a718d637aae8f8bd6aa7c82934840b113308495fdd6c66c6448b5a5b67c3",
+                "sha256:ad690d892185de64695d2ec4b793afa94f3a2b401d8054aa49c363983da67d08"
             ],
             "index": "pypi",
-            "version": "==0.33.2"
+            "version": "==0.33.3"
         },
         "pywin32": {
             "hashes": [
@@ -1286,11 +1276,11 @@
         },
         "testpath": {
             "hashes": [
-                "sha256:1acf7a0bcd3004ae8357409fc33751e16d37ccc650921da1094a86581ad1e417",
-                "sha256:8044f9a0bab6567fc644a3593164e872543bb44225b0e24846e2c89237937589"
+                "sha256:2f1b97e6442c02681ebe01bd84f531028a7caea1af3825000f52345c30285e0f",
+                "sha256:8ada9f80a2ac6fb0391aa7cdb1a7d11cfa8429f693eda83f74dde570fe6fa639"
             ],
             "markers": "python_version >= '3.5'",
-            "version": "==0.5.0"
+            "version": "==0.6.0"
         },
         "tomli": {
             "hashes": [
