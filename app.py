@@ -1,18 +1,18 @@
-from flask import Flask
-from flask_restful import Api, Resource
 
-
-app = Flask(__name__)
-api = Api(app)
+class App:
     
-
-class HelloWorld(Resource):
-    def get(self):
-        return {"data": "Hello World"}
-
-api.add_resource(HelloWorld, "/helloworld")
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
-
+    def __init__(self):
+        pass
+        
+    def point_cloud_visualization(self):
+        pass
+    
+    def request_session_names(self):
+        pass
+    
+    def request_session_points(self):
+        pass
+    
+    
+App()
+    

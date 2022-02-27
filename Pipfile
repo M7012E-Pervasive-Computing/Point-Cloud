@@ -4,11 +4,9 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-flask = "*"
 numpy = "*"
 vtk = "*"
 pyvista = "*"
-flask-restful = "*"
 open3d = "*"
 requests = "*"
 
