@@ -13,6 +13,5 @@ class App:
     def request_session_points(self):
         pass
     
-    
 App()
     
