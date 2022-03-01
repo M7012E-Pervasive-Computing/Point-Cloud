@@ -13,5 +13,5 @@ class VisualizationPointCloud:
     
     
     def visualize(self): 
-        pass
+        print('[' + self.get_name() +'] Visualizing')
     
