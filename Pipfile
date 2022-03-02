@@ -7,7 +7,7 @@ name = "pypi"
 numpy = "*"
 vtk = "*"
 pyvista = "*"
-open3d = "*"
+open3d = "==0.14.1"
 requests = "*"
 
 [dev-packages]
