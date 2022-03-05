@@ -1,7 +1,4 @@
 from open3d import utility, visualization, geometry
-import numpy as np
-import requests
-import json
 
 from visualization.vizPointCloud import VisualizationPointCloud
         
@@ -15,7 +12,7 @@ class Open3DPointCloud(VisualizationPointCloud):
         super().__init__('OPEN3D', points)
         self.width = width
         self.height = height
-        
+
     def visualize(self): 
         super().visualize()
         
@@ -33,6 +30,3 @@ class Open3DPointCloud(VisualizationPointCloud):
         # Run interactive window of visualizer
         vis.run()
         
-    
-        
-

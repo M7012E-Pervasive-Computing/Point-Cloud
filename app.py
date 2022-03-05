@@ -1,8 +1,8 @@
 
-from urllib import request
 
 import requests
 import json
+from optimizing.Optimizing import Optimizing
 
 from visualization.open3DPointCloud import Open3DPointCloud
 from visualization.pyvistaPointCloud import PyvistaPointCloud
@@ -15,6 +15,11 @@ class App:
     def __init__(self):
         self.session_name = self._request_session_names()
         self.points = self._request_session_points(self.session_name)
+        
+        result = input('Optimize [y/n]')
+        if result == 'y':
+            self.points = Optimizing(self.points).optimize_data(ratio=0.2, neighbors=10)
+            
         self.visualization = self._select_visualization()
         self.visualization.visualize()
             
