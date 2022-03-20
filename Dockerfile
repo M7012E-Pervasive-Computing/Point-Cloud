@@ -25,7 +25,7 @@ FROM base AS runtime
 COPY --from=python-deps /.venv /.venv
 ENV PATH="/.venv/bin:$PATH"
 
-#! Create and switch to a new user
+# Create and switch to a new user
 RUN useradd --create-home appuser
 WORKDIR /home/appuser
 USER appuser
@@ -33,9 +33,7 @@ USER appuser
 # Install application into container
 COPY . .
 
-#! Run the application
+# Run the application
 # ENTRYPOINT ["python", "-m", "http.server"]
 # CMD ["--directory", "directory", "8000"]
-
-# localhost:5000
-CMD [ "python3", "-m", "flask", "run", "--host=0.0.0.0"]
+CMD [ "python", "./app.py"]
