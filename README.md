@@ -16,10 +16,6 @@ PyVista package
 Open3d package
 VTK package
 
-### Installing
-
-
-
 ### Executing program
 
 Start the pipenv enviroment
@@ -28,13 +24,9 @@ Start the pipenv enviroment
 Run file using pipenv
 > pipenv run python <file.py>
 
-## Help
-
-
-
 ## Authors
 
-The Dronerz Team
+The Dronerz Team  
 Dennis Trollsfjord, dentro-8@student.ltu.se  
 Antonio Saldaña, anosal-1@student.ltu.se  
 Hugo Pettersson, hugpet-8@student.ltu.se  
