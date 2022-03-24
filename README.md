@@ -11,10 +11,13 @@ This Python program has been created to receive 3-dimensional coordinates coming
 ### Requirements
 
 Python 3.9
-Numpy package
-PyVista package
-Open3d package
-VTK package
+
+Packages:  
+
+Numpy  
+PyVista  
+Open3d   
+VTK  
 
 ### Executing program
 
