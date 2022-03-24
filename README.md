@@ -35,10 +35,10 @@ Run file using pipenv
 ## Authors
 
 The Dronerz Team
-Dennis Trollsfjord, dentro-8@student.ltu.se
-Antonio Saldaña, anosal-1@student.ltu.se
-Hugo Pettersson, hugpet-8@student.ltu.se
-Erik Sörensen, erisre-8@student.ltu.se
-Johan Olsson, ojaolo-8@student.ltu.se
+Dennis Trollsfjord, dentro-8@student.ltu.se  
+Antonio Saldaña, anosal-1@student.ltu.se  
+Hugo Pettersson, hugpet-8@student.ltu.se  
+Erik Sörensen, erisre-8@student.ltu.se  
+Johan Olsson, ojaolo-8@student.ltu.se  
 
 
