@@ -8,17 +8,6 @@ This Python program has been created to receive 3-dimensional coordinates coming
 
 ## Getting Started
 
-### Requirements
-
-Python 3.9
-
-Packages:  
-
-Numpy  
-PyVista  
-Open3d   
-VTK  
-
 ### Executing program
 
 Start the pipenv enviroment
