@@ -10,11 +10,8 @@ This Python program has been created to receive 3-dimensional coordinates coming
 
 ### Executing program
 
-Start the pipenv enviroment
-> pipenv shell 
-
 Run file using pipenv
-> pipenv run python <file.py>
+> pipenv run python app.py
 
 ## Authors
 
