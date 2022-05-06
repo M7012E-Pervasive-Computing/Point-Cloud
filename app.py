@@ -8,6 +8,8 @@ from visualization.open3DPointCloud import Open3DPointCloud
 from visualization.pyvistaPointCloud import PyvistaPointCloud
 from visualization.vizPointCloud import VisualizationPointCloud
 
+import numpy as np
+
 class App:
     """App for visualization of point clouds which are requested from point-service.
     """
@@ -15,6 +17,12 @@ class App:
     def __init__(self):
         self.session_name = self._request_session_names()
         self.points = self._request_session_points(self.session_name)
+        self.points = np.array([
+            [self.points[i]["x"],
+            self.points[i]["y"],
+            self.points[i]["z"]] 
+            for i in range(len(self.points))])
+
         
         result = input('Optimize [y/n]')
         if result == 'y':
