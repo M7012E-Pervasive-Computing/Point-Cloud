@@ -1,5 +1,3 @@
-
-
 import requests
 import json
 from optimizing.Optimizing import Optimizing
@@ -23,14 +21,24 @@ class App:
             self.points[i]["z"]] 
             for i in range(len(self.points))])
 
-        
-        result = input('Optimize [y/n]')
-        if result == 'y':
-            self.points = Optimizing(self.points).optimize_data(ratio=0.2, neighbors=10)
+        if (input('Do you want to optimize the point cloud? (y/n)') == 'y'):
+            self.should_optimize()
             
         self.visualization = self._select_visualization()
         self.visualization.visualize()
-            
+
+    def should_optimize(self):
+        optimizing = Optimizing(self.points)
+        while (True):
+            result = input('Optimize point cloud with: \n[1] Statistical outlier \n[2] Radius outlier \n[3] Exit\n')
+            if result == '1':
+                self.points = optimizing.statistical_outlier(ratio=0.2, neighbors=10)
+            elif result == '2':
+                self.points = optimizing.radius_outlier(nb_points=12, radius=0.10)
+            elif result == '3' or result == 'exit':
+                self.points = optimizing.get_points()
+                break
+
     def _request_session_names(self) -> str:
         """Requests all session names from point-service and creates a string from the sessions.
         Then it request int input which is represented as a specific session name.
