@@ -29,12 +29,12 @@ class Optimizing():
         # only gives the specific points by index
         inlier_cloud = self.voxel_down_pcd.select_by_index(index)
         # create a numpy array from the chosen points
-        removed_data = np.asarray(inlier_cloud.points)
+        saved_data = np.asarray(inlier_cloud.points)
         
         # restore data to original shape
-        print('Removed', str(len(self.points) - len(removed_data)), '\nPoints left: ' + str(len(removed_data)))
+        print('Removed', str(len(self.points) - len(saved_data)), '\nPoints left: ' + str(len(saved_data)))
 
-        self.points = removed_data
+        self.points = saved_data
         self.point_cloud.points = o3d.utility.Vector3dVector(self.points)
     
     def get_points(self):
