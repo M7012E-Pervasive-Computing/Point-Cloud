@@ -1,6 +1,7 @@
 import requests
 import json
 from optimizing.Optimizing import Optimizing
+from optimizing.Clustering import Clustering
 
 from visualization.open3DPointCloud import Open3DPointCloud
 from visualization.pyvistaPointCloud import PyvistaPointCloud
@@ -23,6 +24,10 @@ class App:
 
         if (input('Do you want to optimize the point cloud? (y/n)') == 'y'):
             self.should_optimize()
+            
+        result = input('Do you want to cluster the points (y/n)? ')
+        if result == 'y':
+            self.points = Clustering(self.points).cluster_data()
             
         self.visualization = self._select_visualization()
         self.visualization.visualize()
