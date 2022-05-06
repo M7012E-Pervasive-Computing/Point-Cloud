@@ -3,6 +3,7 @@
 import requests
 import json
 from optimizing.Optimizing import Optimizing
+from optimizing.Clustering import Clustering
 
 from visualization.open3DPointCloud import Open3DPointCloud
 from visualization.pyvistaPointCloud import PyvistaPointCloud
@@ -24,12 +25,16 @@ class App:
             for i in range(len(self.points))])
 
         
-        result = input('Optimize [y/n]')
+        result = input('Do you want to cluster the points (y/n)? ')
         if result == 'y':
-            self.points = Optimizing(self.points).optimize_data(ratio=0.2, neighbors=10)
+            self.points = Clustering(self.points).cluster_points()
+        
+        # result = input('Optimize [y/n]')
+        # if result == 'y':
+        #     self.points = Optimizing(self.points).optimize_data(ratio=0.2, neighbors=10)
             
-        self.visualization = self._select_visualization()
-        self.visualization.visualize()
+        # self.visualization = self._select_visualization()
+        # self.visualization.visualize()
             
     def _request_session_names(self) -> str:
         """Requests all session names from point-service and creates a string from the sessions.
