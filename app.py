@@ -24,14 +24,14 @@ class App:
             self.points[i]["z"]] 
             for i in range(len(self.points))])
 
+        result = input('Optimize [y/n]')
+        if result == 'y':
+            self.points = Optimizing(self.points).optimize_data(ratio=0.2, neighbors=10)
         
         result = input('Do you want to cluster the points (y/n)? ')
         if result == 'y':
-            self.points = Clustering(self.points).cluster_points()
+            self.points = Clustering(self.points).cluster_data()
         
-        # result = input('Optimize [y/n]')
-        # if result == 'y':
-        #     self.points = Optimizing(self.points).optimize_data(ratio=0.2, neighbors=10)
             
         # self.visualization = self._select_visualization()
         # self.visualization.visualize()

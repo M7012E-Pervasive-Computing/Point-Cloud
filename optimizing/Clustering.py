@@ -16,7 +16,7 @@ class Clustering():
         with o3d.utility.VerbosityContextManager(
             o3d.utility.VerbosityLevel.Debug) as cm:
             labels = np.array(
-                pcd.cluster_dbscan(eps=0.02, min_points=10, print_progress=True))
+                pcd.cluster_dbscan(eps=0.13, min_points=10, print_progress=True))
 
         max_label = np.max(labels)
         print(f"point cloud has {max_label + 1} clusters")
