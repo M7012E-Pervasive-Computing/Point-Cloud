@@ -1,12 +1,14 @@
 
+import open3d as o3d
+
 class Ransac():
     
     def __init__(self, points: list):
         self.points = points
         
     def ransac_data(self):
-        point_cloud = geometry.PointCloud()
-        point_cloud.points = utility.Vector3dVector(self.points)
+        point_cloud = o3d.geometry.PointCloud()
+        point_cloud.points = o3d.utility.Vector3dVector(self.points)
         model, inliers = point_cloud.segment_plane(distance_threshold=0.01,
                                          ransac_n=3,
                                          num_iterations=1000)
