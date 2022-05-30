@@ -2,6 +2,7 @@ import requests
 import json
 from optimizing.Optimizing import Optimizing
 from optimizing.Clustering import Clustering
+from optimizing.Ransac import Ransac
 
 from visualization.open3DPointCloud import Open3DPointCloud
 from visualization.pyvistaPointCloud import PyvistaPointCloud
@@ -28,6 +29,10 @@ class App:
         result = input('Do you want to cluster the points (y/n)? ')
         if result == 'y':
             self.points = Clustering(self.points).cluster_data()
+            
+        result = input('Ransac (y/n)?')
+        if result == 'y':
+            self.points = Ransac(self.points).ransac_data()
             
         self.visualization = self._select_visualization()
         self.visualization.visualize()
