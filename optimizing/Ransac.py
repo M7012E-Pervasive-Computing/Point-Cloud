@@ -6,7 +6,7 @@ class Ransac():
     def __init__(self, points: list):
         self.points = points
         
-    def ransac_data(self):
+    def apply(self):
         point_cloud = o3d.geometry.PointCloud()
         point_cloud.points = o3d.utility.Vector3dVector(self.points)
         model, inliers = point_cloud.segment_plane(distance_threshold=0.01,
@@ -23,3 +23,4 @@ class Ransac():
                                         front=[-0.4999, -0.1659, -0.8499],
                                         lookat=[2.1813, 2.0619, 2.0999],
                                         up=[0.1204, -0.9852, 0.1215])
+        return inliers
