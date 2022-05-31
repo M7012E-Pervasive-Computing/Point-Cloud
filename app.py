@@ -23,7 +23,7 @@ class App:
             self.points[i]["z"]] 
             for i in range(len(self.points))])
 
-        if (input('Do you want to optimize the point cloud? (y/n)') == 'y'):
+        if (input('Do you want to optimize the point cloud? (y/n)? ') == 'y'):
             self.should_optimize()
             
         result = input('Do you want to cluster the points (y/n)? ')
