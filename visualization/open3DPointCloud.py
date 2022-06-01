@@ -1,5 +1,6 @@
 from open3d import utility, visualization, geometry
 
+from objects.PointCloud import PointCloud 
 from visualization.vizPointCloud import VisualizationPointCloud
         
 class Open3DPointCloud(VisualizationPointCloud):
@@ -8,22 +9,18 @@ class Open3DPointCloud(VisualizationPointCloud):
     http://www.open3d.org/docs/release/tutorial/visualization/non_blocking_visualization.html
     """
     
-    def __init__(self, points: list, width=480, height=480):
-        super().__init__('OPEN3D', points)
+    def __init__(self, point_cloud: list, width=480, height=480):
+        super().__init__('OPEN3D', point_cloud)
         self.width = width
         self.height = height
 
     def visualize(self): 
         super().visualize()
         
-        # Create point cloud
-        point_cloud = geometry.PointCloud()
-        point_cloud.points = utility.Vector3dVector(self.points)
-        
         # Create visualizer
         vis = visualization.Visualizer()
         vis.create_window(width=self.width, height=self.height)
-        vis.add_geometry(point_cloud)
+        vis.add_geometry(self.point_cloud.get())
         vis.poll_events()
         vis.update_renderer()
         

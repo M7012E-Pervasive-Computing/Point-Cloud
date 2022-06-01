@@ -1,11 +1,12 @@
+from objects.PointCloud import PointCloud
 
 import numpy as np
 
 class VisualizationPointCloud: 
     
-    def __init__(self, name: str, points: list) -> None:
+    def __init__(self, name: str, point_cloud: PointCloud) -> None:
         self._name = name; 
-        self.points = points
+        self.point_cloud = point_cloud
         
     
     def get_name(self) -> str: 
@@ -13,5 +14,5 @@ class VisualizationPointCloud:
     
     
     def visualize(self): 
-        print('[' + self.get_name() +'] Visualizing')
+        print(f"[{self.get_name()}] Visualizing")
     

@@ -1,16 +1,15 @@
+from objects.PointCloud import PointCloud
 
 import open3d as o3d
 import numpy as np
 
 class Ransac():
     
-    def __init__(self, points: np.array):
-        self.points = points
+    def __init__(self, point_cloud: PointCloud, debug: bool):
+        self.point_cloud = point_cloud
         
     def apply(self):
-        point_cloud = o3d.geometry.PointCloud()
-        point_cloud.points = o3d.utility.Vector3dVector(self.points)
-        model, inliers = point_cloud.segment_plane(distance_threshold=0.01,
+        model, inliers = self.point_cloud.segment_plane(distance_threshold=0.01,
                                          ransac_n=4,
                                          num_iterations=1000)
         
@@ -25,8 +24,9 @@ class Ransac():
         print(f"Removed points: {(np.asarray(inlier_cloud.points)).size}")
         print(f"Points left: {(np.asarray(outlier_cloud.points)).size}")
         
-        o3d.visualization.draw_geometries([inlier_cloud, outlier_cloud],
-                                        zoom=0.8,
-                                        front=[-0.4999, -0.1659, -0.8499],
-                                        lookat=[2.1813, 2.0619, 2.0999],
-                                        up=[0.1204, -0.9852, 0.1215])
+        if self.debug:
+            o3d.visualization.draw_geometries([inlier_cloud, outlier_cloud],
+                                            zoom=0.8,
+                                            front=[-0.4999, -0.1659, -0.8499],
+                                            lookat=[2.1813, 2.0619, 2.0999],
+                                            up=[0.1204, -0.9852, 0.1215])

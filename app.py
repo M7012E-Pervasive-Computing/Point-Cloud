@@ -1,5 +1,8 @@
 import requests
 import json
+
+from objects.PointCloud import PointCloud
+
 from optimizing.Optimizing import Optimizing
 from optimizing.Clustering import Clustering
 from optimizing.Ransac import Ransac
@@ -15,38 +18,41 @@ class App:
     """
     
     def __init__(self):
+        self.debug = True
         self.session_name = self._request_session_names()
-        self.points = self._request_session_points(self.session_name)
-        self.points = np.array([
-            [self.points[i]["x"],
-            self.points[i]["y"],
-            self.points[i]["z"]] 
-            for i in range(len(self.points))])
+        points = self._request_session_points(self.session_name)
+        points = np.array([
+            [points[i]["x"],
+            points[i]["y"],
+            points[i]["z"]] 
+            for i in range(len(points))])
+        
+        self.point_cloud = PointCloud(points, self.debug) 
 
         if (input('Do you want to optimize the point cloud? (y/n)? ') == 'y'):
             self.should_optimize()
             
         result = input('Do you want to cluster the points (y/n)? ')
         if result == 'y':
-            Clustering(self.points).cluster_data()
+            Clustering(self.point_cloud, self.debug).cluster_data()
             
         result = input('Do you want to apply Ransac (y/n)? ')
         if result == 'y':
-            Ransac(self.points).apply()
+            Ransac(self.point_cloud, self.debug).apply()
             
         self.visualization = self._select_visualization()
         self.visualization.visualize()
 
     def should_optimize(self):
-        optimizing = Optimizing(self.points)
+        optimizing = Optimizing(self.point_cloud, self.debug)
         while (True):
             result = input('Optimize point cloud with: \n[1] Statistical outlier \n[2] Radius outlier \n[3] Exit\n')
             if result == '1':
-                self.points = optimizing.statistical_outlier(ratio=0.2, neighbors=10)
+                optimizing.statistical_outlier(ratio=0.2, neighbors=10)
             elif result == '2':
-                self.points = optimizing.radius_outlier(nb_points=12, radius=0.10)
+                optimizing.radius_outlier(nb_points=12, radius=0.10)
             elif result == '3' or result == 'exit':
-                self.points = optimizing.get_points()
+                self.point_cloud = optimizing.get_point_cloud()
                 break
 
     def _request_session_names(self) -> str:
@@ -68,7 +74,7 @@ class App:
         
         return sessions[session_picked - 1]
     
-    def _request_session_points(self, session_name: str) -> np.array:
+    def _request_session_points(self, session_name: str) -> list:
         """Request points from session which are requested from point-service.
 
         Args:
@@ -80,7 +86,7 @@ class App:
         
         request = requests.get('http://130.240.202.87:3000/' + session_name)
         points = json.loads(request.text)
-        return np.array(points)
+        return points
     
     def _select_visualization(self) -> VisualizationPointCloud:
         """Let user pick a visualization for point cloud.
@@ -93,9 +99,9 @@ class App:
             2, 'Pick visualization: \n[1] open3D \n[2] pyvista\n')
         
         if (visualization_picked == 1):
-            return Open3DPointCloud(self.points)
+            return Open3DPointCloud(self.point_cloud)
         elif (visualization_picked == 2):
-            return PyvistaPointCloud(self.points)
+            return PyvistaPointCloud(self.point_cloud)
     
     def _get_int_input(self, max: int, print_str: str = ''): 
         """Help function which returns a valid int between 1 and max, which is given by user. 
