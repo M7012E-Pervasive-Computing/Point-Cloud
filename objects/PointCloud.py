@@ -7,6 +7,7 @@ class PointCloud():
         self.point_cloud = o3d.geometry.PointCloud()
         self.point_cloud.points = o3d.utility.Vector3dVector(points)
         self.normals()
+        self.debug = debug 
         
     def normals(self, radius=0.1, max_nn=30) -> None:
         self.point_cloud.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=radius, max_nn=max_nn))
@@ -20,7 +21,10 @@ class PointCloud():
             print("Successfully updated point cloud")
             
     def set_points(self, points) -> None:
-        self.point_cloud.points = points
+        if type(points) is np.array or type(points) is list:
+            self.point_cloud.points = o3d.utility.Vector3dVector(self.points)
+        else:
+            self.point_cloud.points = points
         self.normals()
         if self.debug:
             print("Successfully updated point cloud points")
