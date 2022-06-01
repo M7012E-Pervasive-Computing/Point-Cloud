@@ -8,6 +8,7 @@ class Ransac():
     def __init__(self, point_cloud: PointCloud, debug: bool):
         self.point_cloud = point_cloud
         self.size = self.point_cloud.get_points()
+        self.debug = debug
         
     def apply(self):
         model, inliers = self.point_cloud.get().segment_plane(distance_threshold=0.01,

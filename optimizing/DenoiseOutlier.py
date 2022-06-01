@@ -10,6 +10,7 @@ class DenoiseOutlier():
         self.voxel_size = 0.02
         self.point_cloud = point_cloud
         self.voxel_down_pcd = self.point_cloud.get().voxel_down_sample(voxel_size=self.voxel_size)
+        self.debug = debug
 
     def statistical_outlier(self, ratio=0.2, neighbors=10):
         # Get the index for what points to keep
