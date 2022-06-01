@@ -68,7 +68,7 @@ class App:
         
         return sessions[session_picked - 1]
     
-    def _request_session_points(self, session_name: str) -> list:
+    def _request_session_points(self, session_name: str) -> np.array:
         """Request points from session which are requested from point-service.
 
         Args:
@@ -80,7 +80,7 @@ class App:
         
         request = requests.get('http://130.240.202.87:3000/' + session_name)
         points = json.loads(request.text)
-        return points
+        return np.array(points)
     
     def _select_visualization(self) -> VisualizationPointCloud:
         """Let user pick a visualization for point cloud.

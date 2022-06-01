@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 class Clustering():
 
-    def __init__(self, points: list):
+    def __init__(self, points: np.array):
         self.points = points
 
 

@@ -4,7 +4,7 @@ import numpy as np
 
 class Ransac():
     
-    def __init__(self, points: list):
+    def __init__(self, points: np.array):
         self.points = points
         
     def apply(self):
