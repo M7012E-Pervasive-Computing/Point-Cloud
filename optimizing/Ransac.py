@@ -8,13 +8,16 @@ class Ransac():
     def __init__(self, point_cloud: PointCloud, debug: bool):
         self.point_cloud = point_cloud
         
+    
+        
     def apply(self):
         model, inliers = self.point_cloud.segment_plane(distance_threshold=0.01,
                                          ransac_n=4,
                                          num_iterations=1000)
         
-        [a, b, c, d] = model
-        print(f"Plane equation: {a:.2f}x + {b:.2f}y + {c:.2f}z + {d:.2f} = 0")
+        if self.debug:
+            [a, b, c, d] = model
+            print(f"Plane equation: {a:.2f}x + {b:.2f}y + {c:.2f}z + {d:.2f} = 0")
 
         inlier_cloud = point_cloud.select_by_index(inliers)
         inlier_cloud.paint_uniform_color([1.0, 0, 0])

@@ -3,7 +3,7 @@ import json
 
 from objects.PointCloud import PointCloud
 
-from optimizing.Optimizing import Optimizing
+from optimizing.DenoiseOutlier import DenoiseOutlier
 from optimizing.Clustering import Clustering
 from optimizing.Ransac import Ransac
 
@@ -29,8 +29,8 @@ class App:
         
         self.point_cloud = PointCloud(points, self.debug) 
 
-        if (input('Do you want to optimize the point cloud? (y/n)? ') == 'y'):
-            self.should_optimize()
+        if (input('Do you want to denoise the point cloud? (y/n)? ') == 'y'):
+            self.should_denoise()
             
         result = input('Do you want to cluster the points (y/n)? ')
         if result == 'y':
@@ -43,16 +43,18 @@ class App:
         self.visualization = self._select_visualization()
         self.visualization.visualize()
 
-    def should_optimize(self):
-        optimizing = Optimizing(self.point_cloud, self.debug)
+    def should_denoise(self):
+        """Denoise point cloud with either Statistical outlier or Radius outlier recursively 
+        """
+        denoise = DenoiseOutlier(self.point_cloud, self.debug)
         while (True):
-            result = input('Optimize point cloud with: \n[1] Statistical outlier \n[2] Radius outlier \n[3] Exit\n')
+            result = input('Denoise point cloud with: \n[1] Statistical outlier \n[2] Radius outlier \n[3] Exit\n')
             if result == '1':
-                optimizing.statistical_outlier(ratio=0.2, neighbors=10)
+                denoise.statistical_outlier(ratio=0.2, neighbors=10)
             elif result == '2':
-                optimizing.radius_outlier(nb_points=12, radius=0.10)
+                denoise.radius_outlier(nb_points=12, radius=0.10)
             elif result == '3' or result == 'exit':
-                self.point_cloud = optimizing.get_point_cloud()
+                self.point_cloud = denoise.get_point_cloud()
                 break
 
     def _request_session_names(self) -> str:

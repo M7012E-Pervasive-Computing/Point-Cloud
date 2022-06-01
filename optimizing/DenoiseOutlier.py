@@ -4,7 +4,7 @@ import numpy as np
 
 from objects.PointCloud import PointCloud
 
-class Optimizing():
+class DenoiseOutlier():
     
     def __init__(self, point_cloud: PointCloud, debug: bool):
         self.point_cloud = point_cloud
