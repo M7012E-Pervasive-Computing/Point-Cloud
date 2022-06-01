@@ -21,7 +21,10 @@ class PointCloud():
             print("Successfully updated point cloud")
             
     def set_points(self, points) -> None:
-        self.point_cloud.points = points
+        if type(points) is np.array or type(points) is list:
+            self.point_cloud.points = o3d.utility.Vector3dVector(self.points)
+        else:
+            self.point_cloud.points = points
         self.normals()
         if self.debug:
             print("Successfully updated point cloud points")
