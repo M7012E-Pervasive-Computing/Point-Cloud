@@ -1,18 +1,24 @@
+from objects.PointCloud import PointCloud
 import open3d as o3d
 import numpy as np
 import matplotlib.pyplot as plt
 
 class Clustering():
 
-    def __init__(self, points: np.array, plot: bool = False):
-        self.points = points
+    def __init__(self, point_cloud: PointCloud, plot: bool = False):
+        self.point_cloud = point_cloud
         self.plot = plot
+
 
 
     def cluster_data(self):
         # creates a points cloud in open3d
-        point_cloud = o3d.geometry.PointCloud()
-        point_cloud.points = o3d.utility.Vector3dVector(self.points)
+        # point_cloud = o3d.geometry.PointCloud()
+        # point_cloud.points = o3d.utility.Vector3dVector(self.point_cloud)
+        
+        point_cloud = self.point_cloud.get()
+        
+        
         pcd = point_cloud.voxel_down_sample(voxel_size=0.02)
         with o3d.utility.VerbosityContextManager(
             o3d.utility.VerbosityLevel.Debug) as cm:
@@ -27,30 +33,14 @@ class Clustering():
         pcd.colors = o3d.utility.Vector3dVector(colors[:, :3])
 
         sorted_arr = self.sort_on_labels(pcd)
-        print(sorted_arr)
-        print("AND THEN")
-        print(sorted_arr[1])
+        
+        return_arr = []
+        for element in sorted_arr:
+            new_point_cloud = PointCloud(element, False)
+            return_arr.append(new_point_cloud)
 
-        point_cloud.points = o3d.utility.Vector3dVector(sorted_arr[2])
-        print(len(pcd.points))
-        print(len(point_cloud.points))
-        o3d.visualization.draw_geometries([point_cloud],
-                                        zoom=0.455,
-                                        front=[-0.4999, -0.1659, -0.8499],
-                                        lookat=[2.1813, 2.0619, 2.0999],
-                                        up=[0.1204, -0.9852, 0.1215])
+        return return_arr
 
-        if (self.plot):
-            print(pcd)
-            o3d.visualization.draw_geometries([pcd],
-                                        zoom=0.455,
-                                        front=[-0.4999, -0.1659, -0.8499],
-                                        lookat=[2.1813, 2.0619, 2.0999],
-                                        up=[0.1204, -0.9852, 0.1215])
-        else:
-            print(pcd)
-            return np.asarray(pcd.points)
-    
     def sort_on_labels(self, pcd):
         all_colors = []
         pcd_colors = np.asarray(pcd.colors)
@@ -59,7 +49,6 @@ class Clustering():
         for color in pcd_colors:
             if (not self.is_in(color, all_colors)):
                 all_colors.append(color)
-        print(all_colors)
         for color in all_colors:
             temp_arr = []
             for index in range(len(pcd_colors)):

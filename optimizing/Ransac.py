@@ -7,7 +7,7 @@ class Ransac():
     
     def __init__(self, point_cloud: PointCloud, debug: bool):
         self.point_cloud = point_cloud
-        self.size = self.point_cloud.get_points()
+        self.size = len(self.point_cloud.get_points())
         self.debug = debug
         
     def apply(self):
@@ -34,8 +34,10 @@ class Ransac():
                                             lookat=[2.1813, 2.0619, 2.0999],
                                             up=[0.1204, -0.9852, 0.1215])
             
+        
         points = np.asarray(outlier_cloud.points)
         self.point_cloud.set_points(points)
-        if (points > (self.size * 0.2)):
+        if (len(points) > (self.size * 0.10)):
             self.apply()
         
+ 
