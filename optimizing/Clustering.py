@@ -12,10 +12,6 @@ class Clustering():
 
 
     def cluster_data(self):
-        # creates a points cloud in open3d
-        # point_cloud = o3d.geometry.PointCloud()
-        # point_cloud.points = o3d.utility.Vector3dVector(self.point_cloud)
-        
         point_cloud = self.point_cloud.get()
         
         
@@ -39,8 +35,19 @@ class Clustering():
             new_point_cloud = PointCloud(element, False)
             return_arr.append(new_point_cloud)
 
+        if (self.plot):
+            print(pcd)
+            o3d.visualization.draw_geometries([pcd],
+                                        zoom=0.455,
+                                        front=[-0.4999, -0.1659, -0.8499],
+                                        lookat=[2.1813, 2.0619, 2.0999],
+                                        up=[0.1204, -0.9852, 0.1215])
+        else:
+            print(pcd)
+            return np.asarray(pcd.points)
         return return_arr
-
+    
+    
     def sort_on_labels(self, pcd):
         all_colors = []
         pcd_colors = np.asarray(pcd.colors)
