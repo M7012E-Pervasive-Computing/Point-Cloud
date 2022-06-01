@@ -7,8 +7,9 @@ from objects.PointCloud import PointCloud
 class DenoiseOutlier():
     
     def __init__(self, point_cloud: PointCloud, debug: bool):
+        self.voxel_size = 0.02
         self.point_cloud = point_cloud
-        self.voxel_down_pcd = self.point_cloud.get().voxel_down_sample(voxel_size=0.02)
+        self.voxel_down_pcd = self.point_cloud.get().voxel_down_sample(voxel_size=self.voxel_size)
 
     def statistical_outlier(self, ratio=0.2, neighbors=10):
         # Get the index for what points to keep
@@ -34,6 +35,7 @@ class DenoiseOutlier():
         
         print(f"Removed', {len(original_data) - len(new_data)} \nPoints left: {len(new_data)}")
         self.point_cloud.set_points(o3d.utility.Vector3dVector(new_data))
+        self.voxel_down_pcd = self.point_cloud.get().voxel_down_sample(voxel_size=self.voxel_size)
     
     def get_point_cloud(self):
         return self.point_cloud
