@@ -8,7 +8,7 @@ from optimizing.Clustering import Clustering
 from optimizing.Ransac import Ransac
 
 from visualization.open3DPointCloud import Open3DPointCloud
-from visualization.pyvistaPointCloud import PyvistaPointCloud
+# from visualization.pyvistaPointCloud import PyvistaPointCloud
 from visualization.vizPointCloud import VisualizationPointCloud
 
 import numpy as np
@@ -73,19 +73,19 @@ class App:
         """
         
         request = requests.get('http://130.240.202.87:3000/names')
-        sessions = json.loads(request.text) # Old service
-        # sessions = json.loads(request.text)['sessionNames'] # new service
+        # sessions = json.loads(request.text) # Old service
+        sessions = json.loads(request.text)['sessionNames'] # new service
         if (len(sessions) == 0):
             print('No sessions available')
             exit()
         sessions_str = 'Pick a session:\n'
         for i in range(len(sessions)):
-            sessions_str += '[' + str(i + 1) + '] ' + str(sessions[i]) + '\n' # Old service
-            # sessions_str += '[' + str(i + 1) + '] ' + str(sessions[i]['sessionName']) + '\n' # New service
+            # sessions_str += '[' + str(i + 1) + '] ' + str(sessions[i]) + '\n' # Old service
+            sessions_str += '[' + str(i + 1) + '] ' + str(sessions[i]['sessionName']) + '\n' # New service
         session_picked = self._get_int_input(len(sessions), sessions_str)
         
-        return sessions[session_picked - 1] # Old service
-        # return sessions[session_picked - 1]['sessionName'] # new service
+        # return sessions[session_picked - 1] # Old service
+        return sessions[session_picked - 1]['sessionName'] # new service
     
     def _request_session_points(self, session_name: str) -> list:
         """Request points from session which are requested from point-service.
@@ -98,8 +98,8 @@ class App:
         """
         
         request = requests.get('http://130.240.202.87:3000/' + session_name)
-        points = json.loads(request.text) # Old service
-        # points = json.loads(request.text)['points'] # New service
+        # points = json.loads(request.text) # Old service
+        points = json.loads(request.text)['points'] # New service
         return points
     
     def _select_visualization(self) -> VisualizationPointCloud:
@@ -109,13 +109,13 @@ class App:
             VisualizationPointCloud: return the visualization chosen 
         """
         
-        visualization_picked = self._get_int_input(
-            2, 'Pick visualization: \n[1] open3D \n[2] pyvista\n')
+        # visualization_picked = self._get_int_input(
+        #     1, 'Pick visualization: \n[1] open3D \n[2] pyvista\n')
         
-        if (visualization_picked == 1):
-            return Open3DPointCloud(self.point_cloud)
-        elif (visualization_picked == 2):
-            return PyvistaPointCloud(self.point_cloud)
+        # if (visualization_picked == 1):
+        return Open3DPointCloud(self.point_cloud)
+        # elif (visualization_picked == 2):
+        #     return PyvistaPointCloud(self.point_cloud)
     
     def _get_int_input(self, max: int, print_str: str = ''): 
         """Help function which returns a valid int between 1 and max, which is given by user. 

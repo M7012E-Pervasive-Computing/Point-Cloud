@@ -6,7 +6,6 @@ name = "pypi"
 [packages]
 numpy = "*"
 vtk = "*"
-pyvista = "*"
 open3d = "==0.14.1"
 requests = "*"
 
