@@ -11,6 +11,7 @@ class Ransac():
         self.size = len(self.point_cloud.get_points())
         self.debug = debug
         self.distance_threshold = 0.01
+        self.planePoints = []
         
     def apply(self):
         model, inliers = self.point_cloud.get().segment_plane(
@@ -48,7 +49,7 @@ class Ransac():
             allZ.append(value[2])
         xyz = [(max(allX), min(allX)), (max(allY), min(allY)), (max(allZ), min(allZ))]
         
-        print("XYZ IS: " + str(xyz))
+        # print("XYZ IS: " + str(xyz))
         
         indexToAdd = -1
         coordinate = None
@@ -73,13 +74,14 @@ class Ransac():
         if indexToAdd == 2:
             planePoints = [(xyz[0][0], xyz[1][0], coordinate), (xyz[0][0], xyz[1][1], coordinate), (xyz[0][1], xyz[1][0], coordinate), (xyz[0][1], xyz[1][1], coordinate)]
         
-        print(f"Plane points: {planePoints}")
-
+        # print(f"Plane points: {planePoints}")
+        self.planePoints.append(planePoints)
 
         points = np.asarray(outlier_cloud.points)
         self.point_cloud.set_points(points)
         if (len(points) > (self.size * 0.05)):
-            self.apply()
+            # self.apply()
+            print('test')
         
-        
- 
+    def get_plane_data(self):
+        return self.planePoints

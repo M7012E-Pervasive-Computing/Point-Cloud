@@ -18,7 +18,8 @@ class PyvistaPointCloud(VisualizationPointCloud):
         
         # Create point cloud
         point_cloud = pv.PolyData(self.point_cloud.get_points())
-        np.allclose(self.points, point_cloud.points)
+        # np.allclose(self.point_cloud.get_points(), point_cloud.points)
+        self.points = self.point_cloud.get_points()
 
         # Make data array using z-component of points array
         data = self.points[:,-1]
@@ -28,4 +29,4 @@ class PyvistaPointCloud(VisualizationPointCloud):
 
         # Plot the points as spheres
         point_cloud.plot(render_points_as_spheres=True)
-        
+

@@ -34,17 +34,6 @@ class Clustering():
         for element in sorted_arr:
             new_point_cloud = PointCloud(element, False)
             return_arr.append(new_point_cloud)
-
-        if (self.plot):
-            print(pcd)
-            o3d.visualization.draw_geometries([pcd],
-                                        zoom=0.455,
-                                        front=[-0.4999, -0.1659, -0.8499],
-                                        lookat=[2.1813, 2.0619, 2.0999],
-                                        up=[0.1204, -0.9852, 0.1215])
-        else:
-            print(pcd)
-            return np.asarray(pcd.points)
         return return_arr
     
     

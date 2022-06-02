@@ -18,7 +18,9 @@ class App:
     """
     
     def __init__(self):
-        self.debug = True
+        self.debug = False
+        if (input('Debug mode? (y/n)') == 'y'):
+            self.debug = True
         self.session_name = self._request_session_names()
         points = self._request_session_points(self.session_name)
         points = np.array([
@@ -37,9 +39,13 @@ class App:
             clustered_point_cloud = Clustering(self.point_cloud, self.debug).cluster_data()    
             result = input('Do you want to apply Ransac (y/n)? ')
             if result == 'y':
+                planeData = []
                 for point_cloud in clustered_point_cloud:
-                    Ransac(point_cloud, self.debug).apply()
-            
+                    ransac = Ransac(point_cloud, self.debug)
+                    ransac.apply()
+                    planeData.extend(ransac.get_plane_data())
+                print(planeData)
+        
         self.visualization = self._select_visualization()
         self.visualization.visualize()
 
@@ -67,14 +73,19 @@ class App:
         """
         
         request = requests.get('http://130.240.202.87:3000/names')
-        sessions = json.loads(request.text)
-        
+        sessions = json.loads(request.text) # Old service
+        # sessions = json.loads(request.text)['sessionNames'] # new service
+        if (len(sessions) == 0):
+            print('No sessions available')
+            exit()
         sessions_str = 'Pick a session:\n'
         for i in range(len(sessions)):
-            sessions_str += '[' + str(i + 1) + '] ' + str(sessions[i]) + '\n'
+            sessions_str += '[' + str(i + 1) + '] ' + str(sessions[i]) + '\n' # Old service
+            # sessions_str += '[' + str(i + 1) + '] ' + str(sessions[i]['sessionName']) + '\n' # New service
         session_picked = self._get_int_input(len(sessions), sessions_str)
         
-        return sessions[session_picked - 1]
+        return sessions[session_picked - 1] # Old service
+        # return sessions[session_picked - 1]['sessionName'] # new service
     
     def _request_session_points(self, session_name: str) -> list:
         """Request points from session which are requested from point-service.
@@ -87,7 +98,8 @@ class App:
         """
         
         request = requests.get('http://130.240.202.87:3000/' + session_name)
-        points = json.loads(request.text)
+        points = json.loads(request.text) # Old service
+        # points = json.loads(request.text)['points'] # New service
         return points
     
     def _select_visualization(self) -> VisualizationPointCloud:
