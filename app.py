@@ -34,11 +34,11 @@ class App:
             
         result = input('Do you want to cluster the points (y/n)? ')
         if result == 'y':
-            Clustering(self.point_cloud, self.debug).cluster_data()
-            
-        result = input('Do you want to apply Ransac (y/n)? ')
-        if result == 'y':
-            Ransac(self.point_cloud, self.debug).apply()
+            clustered_point_cloud = Clustering(self.point_cloud, self.debug).cluster_data()    
+            result = input('Do you want to apply Ransac (y/n)? ')
+            if result == 'y':
+                for point_cloud in clustered_point_cloud:
+                    Ransac(point_cloud, self.debug).apply()
             
         self.visualization = self._select_visualization()
         self.visualization.visualize()
