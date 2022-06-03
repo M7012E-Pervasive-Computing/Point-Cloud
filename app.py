@@ -44,10 +44,12 @@ class App:
                     ransac = Ransac(point_cloud, self.debug)
                     ransac.apply()
                     planeData.extend(ransac.get_plane_data())
-                print(planeData)
+                self.write_obj_file(planeData)
         
         self.visualization = self._select_visualization()
         self.visualization.visualize()
+        if (input('Do you want to save the point cloud? (y/n)? ') == 'y'):
+            self.save_point_cloud(self.point_cloud.point_cloud.points)
 
     def should_denoise(self):
         """Denoise point cloud with either Statistical outlier or Radius outlier recursively 
@@ -140,5 +142,59 @@ class App:
                 print('Not a valid input')
         return result
     
+    def write_obj_file(self, planeData):
+        print(planeData)
+        planeData = self.remove_empty_arrays(planeData)
+        print(planeData)
+        f = open("test.obj", "w")
+        for i in range(len(planeData)):
+            for j in range(len(planeData[i])):
+                f.write("v " + str(planeData[i][j][0]) + " " + str(planeData[i][j][1]) + " " + str(planeData[i][j][2]) + " 1.0" + "\n")
+        print(len(planeData))
+        for i in range(len(planeData)):
+            # 1/1/1 2/2/1 4/3/1 3/4/1
+            # f 1 2 3 4
+            # f 8 7 6 5
+            # f 4 3 7 8
+            
+            # f 5 1 4 8
+            # f 5 6 2 1
+            # f 2 6 7 3
+            f.write("f " +
+                    str(i * 8 + 1) + " " + str(i * 8 + 2) + " " + str(i * 8 + 3) + " " + str(i * 8 + 4) +"\n")
+            f.write("f " +
+                    str(i * 8 + 8) + " " + str(i * 8 + 7) + " " + str(i * 8 + 6) + " " + str(i * 8 + 5) +"\n")
+            f.write("f " +
+                    str(i * 8 + 4) + " " + str(i * 8 + 3) + " " + str(i * 8 + 7) + " " + str(i * 8 + 8) +"\n")
+            
+            f.write("f " +
+                    str(i * 8 + 5) + " " + str(i * 8 + 1) + " " + str(i * 8 + 4) + " " + str(i * 8 + 8) +"\n")
+            f.write("f " +
+                    str(i * 8 + 5) + " " + str(i * 8 + 6) + " " + str(i * 8 + 2) + " " + str(i * 8 + 1) +"\n")
+            f.write("f " +
+                    str(i * 8 + 2) + " " + str(i * 8 + 6) + " " + str(i * 8 + 7) + " " + str(i * 8 + 3) +"\n")
+            # f.write("f " +
+            #         str(i * 4 + 1) + "/" + str(i * 4 + 1) + "/" + str(i * 4 + 1) + " " +
+            #         str(i * 4 + 2) + "/" + str(i * 4 + 2) + "/" + str(i * 4 + 1) + " " +
+            #         str(i * 4 + 4) + "/" + str(i * 4 + 3) + "/" + str(i * 4 + 1) + " " +
+            #         str(i * 4 + 3) + "/" + str(i * 4 + 4) + "/" + str(i * 4 + 1) + "\n")
+        f.close()
+
+    def save_point_cloud(self, planeData):
+        fileName = input("Enter file name: ")
+        f = open(fileName + ".obj", "w")
+        for i in range(len(planeData)):
+            f.write("o " + fileName + "." + str(i) + "\n")
+            f.write("v " + str(planeData[i][0]) + " " + str(planeData[i][1]) + " " + str(planeData[i][2]) + " 1.0" + "\n")
+        f.close()
+    
+    def remove_empty_arrays(self, planeData):
+        returnData = []
+        for i in range(len(planeData)):
+            if planeData[i] == []:
+                continue
+            returnData.append(planeData[i])
+        return returnData
+
 App()
     
