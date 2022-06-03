@@ -1,6 +1,8 @@
 import requests
 import json
 
+import os
+
 from objects.PointCloud import PointCloud
 
 from optimizing.DenoiseOutlier import DenoiseOutlier
@@ -8,7 +10,7 @@ from optimizing.Clustering import Clustering
 from optimizing.Ransac import Ransac
 
 from visualization.open3DPointCloud import Open3DPointCloud
-# from visualization.pyvistaPointCloud import PyvistaPointCloud
+from visualization.pyvistaPointCloud import PyvistaPointCloud
 from visualization.vizPointCloud import VisualizationPointCloud
 
 import numpy as np
@@ -37,14 +39,46 @@ class App:
         result = input('Do you want to cluster the points (y/n)? ')
         if result == 'y':
             clustered_point_cloud = Clustering(self.point_cloud, self.debug).cluster_data()    
-            result = input('Do you want to apply Ransac (y/n)? ')
-            if result == 'y':
-                planeData = []
-                for point_cloud in clustered_point_cloud:
-                    ransac = Ransac(point_cloud, self.debug)
-                    ransac.apply()
-                    planeData.extend(ransac.get_plane_data())
-                print(planeData)
+            # result = input('Do you want to apply Ransac (y/n)? ')
+            # if result == 'y':
+            #     planeData = []
+            #     for point_cloud in clustered_point_cloud:
+            #         ransac = Ransac(point_cloud, self.debug)
+            #         ransac.apply()
+            #         planeData.extend(ransac.get_plane_data())
+            #     print(planeData)
+            import pyvista as pv
+            color = np.array(['red', 'blue', 'green', 'yellow', 'orange', 'pink'])
+            p = pv.Plotter(shape=(1, 1))
+            for c in clustered_point_cloud: 
+                col = np.random.choice(color)
+                
+                cloud = c.get()
+                center = cloud.get_center()
+                max = cloud.get_max_bound()
+                min = cloud.get_min_bound()
+                print(f"max: {max} \tmin: {min}")
+                # cube = pv.Cube(
+                #     center=center, 
+                #     x_length=np.abs(max[0]) + np.abs(min[0]), 
+                #     y_length=np.abs(max[1]) + np.abs(min[1]), 
+                #     z_length=np.abs(max[2]) + np.abs(min[2]))
+                cube = pv.Cube(center=center, bounds=(min[0], max[0], min[1], max[1], min[2], max[2]))
+                
+                # p2 = pv.Plotter(shape=(1,2))
+                # p2.add_mesh(c.get_pv(), color=col, show_edges=True)
+                # p2.subplot(0, 1)
+                # p2.add_mesh(cube, color=col, show_edges=True)
+                # p2.show()
+                
+                # p.subplot(0,0)
+                p.add_mesh(c.get_pv(), color=col, show_edges=True)
+                # p.subplot(0,1)
+                p.add_mesh(cube, color=col, show_edges=True, opacity=0.5)
+            p.show()
+               
+                
+                
         
         self.visualization = self._select_visualization()
         self.visualization.visualize()
@@ -109,13 +143,13 @@ class App:
             VisualizationPointCloud: return the visualization chosen 
         """
         
-        # visualization_picked = self._get_int_input(
-        #     1, 'Pick visualization: \n[1] open3D \n[2] pyvista\n')
+        visualization_picked = self._get_int_input(
+            2, 'Pick visualization: \n[1] open3D \n[2] pyvista\n')
         
-        # if (visualization_picked == 1):
-        return Open3DPointCloud(self.point_cloud)
-        # elif (visualization_picked == 2):
-        #     return PyvistaPointCloud(self.point_cloud)
+        if (visualization_picked == 1):
+            return Open3DPointCloud(self.point_cloud)
+        elif (visualization_picked == 2):
+            return PyvistaPointCloud(self.point_cloud)
     
     def _get_int_input(self, max: int, print_str: str = ''): 
         """Help function which returns a valid int between 1 and max, which is given by user. 

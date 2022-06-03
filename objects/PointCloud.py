@@ -1,4 +1,5 @@
 import open3d as o3d
+import pyvista as pv
 import numpy as np
 
 class PointCloud():
@@ -36,6 +37,12 @@ class PointCloud():
 
     def get(self) -> o3d.geometry.PointCloud:
         return self.point_cloud
+      
+    def get_pv(self):
+        points = self.get_points()
+        point_cloud = pv.PolyData(points)
+        np.allclose(points, point_cloud.points)
+        return point_cloud
 
     def get_points(self) -> np.array:
         return np.asarray(self.point_cloud.points)
