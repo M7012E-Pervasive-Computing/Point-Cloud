@@ -10,7 +10,7 @@ class Ransac():
         self.point_cloud = point_cloud
         self.size = len(self.point_cloud.get_points())
         self.debug = debug
-        self.distance_threshold = 1
+        self.distance_threshold = 0.05
         self.planePoints = []
         
     def apply(self):
@@ -52,32 +52,38 @@ class Ransac():
         
         print("XYZ IS: " + str(xyz))
         
-        indexToAdd = -1
-        coordinate = None
-        if (abs(xyz[0][0] - xyz[0][1]) <= self.distance_threshold):
-            indexToAdd = 0
-            coordinate = min(xyz[0]) + (xyz[0][0] - xyz[0][1]) / 2
-            xyz.remove(xyz[0])
-        elif (abs(xyz[1][0] - xyz[1][1]) <= self.distance_threshold):
-            indexToAdd = 1
-            coordinate = min(xyz[1]) + (xyz[1][0] - xyz[1][1]) / 2
-            xyz.remove(xyz[1])
-        elif (abs(xyz[2][0] - xyz[2][1]) <= self.distance_threshold):
-            indexToAdd = 2
-            coordinate = min(xyz[2]) + (xyz[2][0] - xyz[2][1]) / 2
-            xyz.remove(xyz[2])
-        else:
-            if (self.debug):
-                # print("X Y Z diff is: " + str(xyz))
-                print("No plane found")
-        
         planePoints = []
-        if indexToAdd == 0:
-            planePoints = [(coordinate, xyz[0][0], xyz[1][0]), (coordinate, xyz[0][0], xyz[1][1]), (coordinate, xyz[0][1], xyz[1][0]), (coordinate, xyz[0][1], xyz[1][1])]
-        if indexToAdd == 1:
-            planePoints = [(xyz[0][0], coordinate, xyz[1][0]), (xyz[0][0], coordinate, xyz[1][1]), (xyz[0][1], coordinate, xyz[1][0]), (xyz[0][1], coordinate, xyz[1][1])]
-        if indexToAdd == 2:
-            planePoints = [(xyz[0][0], xyz[1][0], coordinate), (xyz[0][0], xyz[1][1], coordinate), (xyz[0][1], xyz[1][0], coordinate), (xyz[0][1], xyz[1][1], coordinate)]
+        # get all combinations of x, y, z
+        for x in range(len(xyz[0])):
+            for y in range(len(xyz[1])):
+                for z in range(len(xyz[2])):
+                    planePoints.append([xyz[0][x], xyz[1][y], xyz[2][z]])
+        # indexToAdd = -1
+        # coordinate = None
+        # if (abs(xyz[0][0] - xyz[0][1]) <= self.distance_threshold):
+        #     indexToAdd = 0
+        #     coordinate = min(xyz[0]) + (xyz[0][0] - xyz[0][1]) / 2
+        #     xyz.remove(xyz[0])
+        # elif (abs(xyz[1][0] - xyz[1][1]) <= self.distance_threshold):
+        #     indexToAdd = 1
+        #     coordinate = min(xyz[1]) + (xyz[1][0] - xyz[1][1]) / 2
+        #     xyz.remove(xyz[1])
+        # elif (abs(xyz[2][0] - xyz[2][1]) <= self.distance_threshold):
+        #     indexToAdd = 2
+        #     coordinate = min(xyz[2]) + (xyz[2][0] - xyz[2][1]) / 2
+        #     xyz.remove(xyz[2])
+        # else:
+        #     if (self.debug):
+        #         # print("X Y Z diff is: " + str(xyz))
+        #         print("No plane found")
+        
+        # planePoints = []
+        # if indexToAdd == 0:
+        #     planePoints = [(coordinate, xyz[0][0], xyz[1][0]), (coordinate, xyz[0][0], xyz[1][1]), (coordinate, xyz[0][1], xyz[1][0]), (coordinate, xyz[0][1], xyz[1][1])]
+        # if indexToAdd == 1:
+        #     planePoints = [(xyz[0][0], coordinate, xyz[1][0]), (xyz[0][0], coordinate, xyz[1][1]), (xyz[0][1], coordinate, xyz[1][0]), (xyz[0][1], coordinate, xyz[1][1])]
+        # if indexToAdd == 2:
+        #     planePoints = [(xyz[0][0], xyz[1][0], coordinate), (xyz[0][0], xyz[1][1], coordinate), (xyz[0][1], xyz[1][0], coordinate), (xyz[0][1], xyz[1][1], coordinate)]
         
         if self.debug:
             print(f"Plane points: {planePoints} \n")
@@ -85,9 +91,8 @@ class Ransac():
 
         points = np.asarray(outlier_cloud.points)
         self.point_cloud.set_points(points)
-        # if (len(points) > (self.size * 0.05)):
-        #     self.apply()
-        #     # print('test')
+        if (len(points) > (self.size * 0.1)):
+            self.apply()
         
     def get_plane_data(self):
         return self.planePoints
