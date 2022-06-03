@@ -23,12 +23,12 @@ class PointCloud():
     def set_points(self, points) -> None:
         print(type(points))
         if isinstance(points, (np.ndarray, np.generic)) or isinstance(points, list):
-            print('is numpy array')
+            # print('is numpy array')
             # self.point_cloud.set_points(o3d.utility.Vector3dVector(self.points))
             # type(points) is np.ndarray or type(points) is list:
             self.point_cloud.points = o3d.utility.Vector3dVector(points)
         else:
-            print('is not numpy array')
+            # print('is not numpy array')
             self.point_cloud.points = points
         self.normals()
         if self.debug:

@@ -10,7 +10,7 @@ class Ransac():
         self.point_cloud = point_cloud
         self.size = len(self.point_cloud.get_points())
         self.debug = debug
-        self.distance_threshold = 0.01
+        self.distance_threshold = 1
         self.planePoints = []
         
     def apply(self):
@@ -19,24 +19,25 @@ class Ransac():
             ransac_n=4,
             num_iterations=1000)
         
-        if self.debug:
-            [a, b, c, d] = model
-            print(f"Plane equation: {a:.2f}x + {b:.2f}y + {c:.2f}z + {d:.2f} = 0")
+        # if self.debug:
+        #     [a, b, c, d] = model
+        #     print(f"Plane equation: {a:.2f}x + {b:.2f}y + {c:.2f}z + {d:.2f} = 0")
 
         inlier_cloud = self.point_cloud.get().select_by_index(inliers)
         inlier_cloud.paint_uniform_color([1.0, 0, 0])
         outlier_cloud = self.point_cloud.get().select_by_index(inliers, invert=True)
         outlier_cloud.paint_uniform_color([0, 0, 1.0])
         
-        print(f"Removed points: {(np.asarray(inlier_cloud.points)).size}")
-        print(f"Points left: {(np.asarray(outlier_cloud.points)).size}")
+        # if self.debug:
+        #     print(f"Removed points: {(np.asarray(inlier_cloud.points)).size}")
+        #     print(f"Points left: {(np.asarray(outlier_cloud.points)).size}")
         
-        if self.debug:
-            o3d.visualization.draw_geometries([inlier_cloud, outlier_cloud],
-                                            zoom=0.8,
-                                            front=[-0.4999, -0.1659, -0.8499],
-                                            lookat=[2.1813, 2.0619, 2.0999],
-                                            up=[0.1204, -0.9852, 0.1215])
+        # if self.debug:
+        #     o3d.visualization.draw_geometries([inlier_cloud, outlier_cloud],
+        #                                     zoom=0.8,
+        #                                     front=[-0.4999, -0.1659, -0.8499],
+        #                                     lookat=[2.1813, 2.0619, 2.0999],
+        #                                     up=[0.1204, -0.9852, 0.1215])
         
         p = np.asarray(inlier_cloud.points)
         # [[x, y, z]]
@@ -49,7 +50,7 @@ class Ransac():
             allZ.append(value[2])
         xyz = [(max(allX), min(allX)), (max(allY), min(allY)), (max(allZ), min(allZ))]
         
-        # print("XYZ IS: " + str(xyz))
+        print("XYZ IS: " + str(xyz))
         
         indexToAdd = -1
         coordinate = None
@@ -65,6 +66,10 @@ class Ransac():
             indexToAdd = 2
             coordinate = min(xyz[2]) + (xyz[2][0] - xyz[2][1]) / 2
             xyz.remove(xyz[2])
+        else:
+            if (self.debug):
+                # print("X Y Z diff is: " + str(xyz))
+                print("No plane found")
         
         planePoints = []
         if indexToAdd == 0:
@@ -74,14 +79,15 @@ class Ransac():
         if indexToAdd == 2:
             planePoints = [(xyz[0][0], xyz[1][0], coordinate), (xyz[0][0], xyz[1][1], coordinate), (xyz[0][1], xyz[1][0], coordinate), (xyz[0][1], xyz[1][1], coordinate)]
         
-        # print(f"Plane points: {planePoints}")
+        if self.debug:
+            print(f"Plane points: {planePoints} \n")
         self.planePoints.append(planePoints)
 
         points = np.asarray(outlier_cloud.points)
         self.point_cloud.set_points(points)
-        if (len(points) > (self.size * 0.05)):
-            # self.apply()
-            print('test')
+        # if (len(points) > (self.size * 0.05)):
+        #     self.apply()
+        #     # print('test')
         
     def get_plane_data(self):
         return self.planePoints

@@ -44,7 +44,7 @@ class App:
                     ransac = Ransac(point_cloud, self.debug)
                     ransac.apply()
                     planeData.extend(ransac.get_plane_data())
-                print(planeData)
+                self.write_obj_file(planeData)
         
         self.visualization = self._select_visualization()
         self.visualization.visualize()
@@ -140,5 +140,33 @@ class App:
                 print('Not a valid input')
         return result
     
+    def write_obj_file(self, planeData):
+        print(planeData)
+        planeData = self.remove_empty_arrays(planeData)
+        print(planeData)
+        f = open("test.obj", "w")
+        for i in range(len(planeData)):
+            for j in range(len(planeData[i])):
+                f.write("v " + str(planeData[i][j][0]) + " " + str(planeData[i][j][1]) + " " + str(planeData[i][j][2]) + " 1.0" + "\n")
+        print(len(planeData))
+        for i in range(len(planeData)):
+            # 1/1/1 2/2/1 4/3/1 3/4/1
+            f.write("f " +
+                    str(i * 4 + 1) + "/" + str(i * 4 + 1) + "/" + str(i * 4 + 1) + " " +
+                    str(i * 4 + 2) + "/" + str(i * 4 + 2) + "/" + str(i * 4 + 1) + " " +
+                    str(i * 4 + 4) + "/" + str(i * 4 + 3) + "/" + str(i * 4 + 1) + " " +
+                    str(i * 4 + 3) + "/" + str(i * 4 + 4) + "/" + str(i * 4 + 1) + "\n")
+                    
+                    # + str(i * 4 + 2) + " " + str(i * 4 + 3) + " " + str(i * 4 + 4) + "\n")
+        f.close()
+    
+    def remove_empty_arrays(self, planeData):
+        returnData = []
+        for i in range(len(planeData)):
+            if planeData[i] == []:
+                continue
+            returnData.append(planeData[i])
+        return returnData
+
 App()
     
