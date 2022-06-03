@@ -24,7 +24,17 @@ class Ransac():
         #     print(f"Plane equation: {a:.2f}x + {b:.2f}y + {c:.2f}z + {d:.2f} = 0")
 
         inlier_cloud = self.point_cloud.get().select_by_index(inliers)
-        return PointCloud(np.asarray(inlier_cloud.points), False)
+        outlier_cloud = self.point_cloud.get().select_by_index(inliers, invert=True)
+        self.point_cloud.set(outlier_cloud)
+        wall =  PointCloud(np.asarray(inlier_cloud.points), False)
+        if len(np.asarray(outlier_cloud.points)) < 10:
+            return [wall]
+        else:
+            result = self.apply()
+            result.append(wall)
+            return result
+       
+        
     #     inlier_cloud.paint_uniform_color([1.0, 0, 0])
     #     outlier_cloud = self.point_cloud.get().select_by_index(inliers, invert=True)
     #     outlier_cloud.paint_uniform_color([0, 0, 1.0])

@@ -50,31 +50,27 @@ class App:
             import pyvista as pv
             color = np.array(['red', 'blue', 'green', 'yellow', 'orange', 'pink'])
             p = pv.Plotter(shape=(1, 1))
-            for c in clustered_point_cloud: 
+            for c1 in clustered_point_cloud: 
                 col = np.random.choice(color)
                 
-                cloud = c.get()
-                center = cloud.get_center()
-                max = cloud.get_max_bound()
-                min = cloud.get_min_bound()
-                print(f"max: {max} \tmin: {min}")
-                # cube = pv.Cube(
-                #     center=center, 
-                #     x_length=np.abs(max[0]) + np.abs(min[0]), 
-                #     y_length=np.abs(max[1]) + np.abs(min[1]), 
-                #     z_length=np.abs(max[2]) + np.abs(min[2]))
-                cube = pv.Cube(center=center, bounds=(min[0], max[0], min[1], max[1], min[2], max[2]))
-                
-                # p2 = pv.Plotter(shape=(1,2))
-                # p2.add_mesh(c.get_pv(), color=col, show_edges=True)
-                # p2.subplot(0, 1)
-                # p2.add_mesh(cube, color=col, show_edges=True)
-                # p2.show()
-                
-                # p.subplot(0,0)
-                p.add_mesh(c.get_pv(), color=col, show_edges=True)
-                # p.subplot(0,1)
-                p.add_mesh(cube, color=col, show_edges=True, opacity=0.5)
+                l = Ransac(c1, self.debug).apply()
+                for c in l:
+                    cloud = c.get()
+                    center = cloud.get_center()
+                    max = cloud.get_max_bound()
+                    min = cloud.get_min_bound()
+                    print(f"max: {max} \tmin: {min}")
+                    cube = pv.Cube(center=center, bounds=(min[0], max[0], min[1], max[1], min[2], max[2]))
+                            
+                    
+                    # p2 = pv.Plotter(shape=(1,2))
+                    # p2.add_mesh(c.get_pv(), color=col, show_edges=True)
+                    # p2.subplot(0, 1)
+                    # p2.add_mesh(cube, color=col, show_edges=True)
+                    # p2.show()
+                    
+                    p.add_mesh(c.get_pv(), color=col, show_edges=True)
+                    p.add_mesh(cube, color=col, show_edges=True, opacity=0.5)
             p.show()
                
                 

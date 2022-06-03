@@ -19,7 +19,7 @@ class Clustering():
         with o3d.utility.VerbosityContextManager(
             o3d.utility.VerbosityLevel.Debug) as cm:
             labels = np.array(
-                pcd.cluster_dbscan(eps=0.23, min_points=80, print_progress=True))
+                pcd.cluster_dbscan(eps=0.2, min_points=10, print_progress=self.plot))
 
         max_label = np.max(labels)
         print(f"point cloud has {max_label + 1} clusters")
@@ -37,14 +37,13 @@ class Clustering():
                                         lookat=[2.1813, 2.0619, 2.0999],
                                         up=[0.1204, -0.9852, 0.1215])
         import pyvista as pv
-        sorted_arr.pop(1)
+        # sorted_arr.pop(1)
         # sorted_arr.pop(2)
         return_arr = []
         for element in sorted_arr:
             new_point_cloud = PointCloud(element, False) 
-            # new_point_cloud.get_pv().plot(render_points_as_spheres=True)
-            # if (input("(y/n)?") == "y"):
-            return_arr.append(new_point_cloud)
+            if len(new_point_cloud.get_points()) > 30:
+                return_arr.append(new_point_cloud)
         return return_arr
     
     
