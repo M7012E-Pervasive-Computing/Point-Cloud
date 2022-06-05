@@ -1,6 +1,7 @@
 import open3d as o3d
 import pyvista as pv
 import numpy as np
+import copy
 import matplotlib.pyplot as plt
 
 
@@ -10,13 +11,11 @@ class Test():
         self.pcd.points = o3d.utility.Vector3dVector(points)
         self.pcd.paint_uniform_color([0, 0, 0])
         
+        self.test()
+        
         self.normals()
         
-        self.denoise()
-        
-        self.ransac_multiple_detection()
-        
-        self.ransac_euclidean_clustering()
+        # self.denoise()
          
     def normals(self, radius=0.1, max_nn=16):
         self.pcd.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=radius, max_nn=max_nn), fast_normal_computation=True)
@@ -74,3 +73,44 @@ class Test():
             
         # Visualize
         o3d.visualization.draw_geometries([segments[i] for i in range(max_plane_idx)]+[rest])
+        
+    def test(self):
+        points = np.array([[10, 10, 1], [10, 11, 1], [9, 2, 1], [12, 4, 1], [5, 1, 1],[4, 1, 1], [3, 1, 1], [2, 5, 1], [5, 7, 1],[7, 4, 1], [8, 11, 1], [10, 12, 1], [2, 13, 1]])
+        self.pcd.points = o3d.utility.Vector3dVector(points)
+        print(self.edgeNeighbors())
+        
+        
+    def edgeNeighbors(self):
+        points = (copy.deepcopy(np.asarray(self.pcd.points))).tolist()
+        length = len(points)
+        edges = []
+        for i in range(length):
+            p1 = points.pop(0)
+            closestDist = np.inf
+            closest = -1
+            for i2, p2 in enumerate(points):
+                dist = self.distance(p1, p2)
+                if dist < closestDist:
+                    closestDist = dist
+                    closest = i + i2
+                else:
+                    continue
+            edges.append([i,i2])
+        edges.append([0, len(np.asarray(self.pcd.points))-1])
+        return edges
+        
+        
+                
+                
+            
+            
+    def distance(self, p1, p2):
+        [x1, y1, z1] = p1
+        [x2, y2, z2] = p2
+        return np.sqrt(((x2-x1)**2) + ((y2-y1)**2) + ((z2-z1)**2))
+            
+        
+    
+        
+        
+        
