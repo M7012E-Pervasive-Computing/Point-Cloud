@@ -6,6 +6,7 @@ from objects.PointCloud import PointCloud
 from optimizing.DenoiseOutlier import DenoiseOutlier
 from optimizing.Clustering import Clustering
 from optimizing.Ransac import Ransac
+from optimizing.Test import Test
 
 from visualization.open3DPointCloud import Open3DPointCloud
 # from visualization.pyvistaPointCloud import PyvistaPointCloud
@@ -18,9 +19,9 @@ class App:
     """
     
     def __init__(self):
-        self.debug = False
-        if (input('Debug mode? (y/n)') == 'y'):
-            self.debug = True
+        # self.debug = False
+        # if (input('Debug mode? (y/n)') == 'y'):
+        #     self.debug = True
         self.session_name = self._request_session_names()
         points = self._request_session_points(self.session_name)
         points = np.array([
@@ -28,28 +29,30 @@ class App:
             points[i]["y"],
             points[i]["z"]] 
             for i in range(len(points))])
+    
+        Test(points)
         
-        self.point_cloud = PointCloud(points, self.debug) 
+        # self.point_cloud = PointCloud(points, self.debug) 
 
-        if (input('Do you want to denoise the point cloud? (y/n)? ') == 'y'):
-            self.should_denoise()
+        # if (input('Do you want to denoise the point cloud? (y/n)? ') == 'y'):
+        #     self.should_denoise()
             
-        result = input('Do you want to cluster the points (y/n)? ')
-        if result == 'y':
-            clustered_point_cloud = Clustering(self.point_cloud, self.debug).cluster_data()    
-            result = input('Do you want to apply Ransac (y/n)? ')
-            if result == 'y':
-                planeData = []
-                for point_cloud in clustered_point_cloud:
-                    ransac = Ransac(point_cloud, self.debug)
-                    ransac.apply()
-                    planeData.extend(ransac.get_plane_data())
-                self.write_obj_file(planeData)
+        # result = input('Do you want to cluster the points (y/n)? ')
+        # if result == 'y':
+        #     clustered_point_cloud = Clustering(self.point_cloud, True).cluster_data()    
+        #     result = input('Do you want to apply Ransac (y/n)? ')
+        #     if result == 'y':
+        #         planeData = []
+        #         for point_cloud in clustered_point_cloud:
+        #             ransac = Ransac(point_cloud, self.debug)
+        #             ransac.apply()
+        #             planeData.extend(ransac.get_plane_data())
+        #         self.write_obj_file(planeData)
         
-        self.visualization = self._select_visualization()
-        self.visualization.visualize()
-        if (input('Do you want to save the point cloud? (y/n)? ') == 'y'):
-            self.save_point_cloud(self.point_cloud.point_cloud.points)
+        # self.visualization = self._select_visualization()
+        # self.visualization.visualize()
+        # if (input('Do you want to save the point cloud? (y/n)? ') == 'y'):
+        #     self.save_point_cloud(self.point_cloud.point_cloud.points)
 
     def should_denoise(self):
         """Denoise point cloud with either Statistical outlier or Radius outlier recursively 
