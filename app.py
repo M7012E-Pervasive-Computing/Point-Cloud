@@ -24,8 +24,8 @@ class App:
         self.session_name = self._request_session_names()
         points = self._request_session_points(self.session_name)
         points = np.array([
-            [points[i]["x"],
-            points[i]["y"],
+            [points[i]["y"],
+            points[i]["x"],
             points[i]["z"]] 
             for i in range(len(points))])
         
