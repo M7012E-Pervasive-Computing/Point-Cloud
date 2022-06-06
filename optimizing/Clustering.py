@@ -49,6 +49,7 @@ class Clustering():
         pcd_arr = np.asarray(pcd.points)
         return_array = []
         for color in pcd_colors:
+            
             if (not self.is_in(color, all_colors)):
                 all_colors.append(color)
         for color in all_colors:
