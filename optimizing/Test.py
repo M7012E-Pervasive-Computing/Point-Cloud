@@ -16,7 +16,7 @@ class Test():
         self.pcd.points = o3d.utility.Vector3dVector(points)
         self.pcd.paint_uniform_color([0, 0, 0])
         
-        self.test2()
+        self.test3()
         
         # self.normals()
         
@@ -28,7 +28,7 @@ class Test():
     #     # Visualize 
     #     o3d.visualization.draw_geometries([self.pcd])
     
-    # def denoise(self, voxel_size=0.02, ratio=0.2, neighbors=10):
+    # def denoise(self, voxel_size=0.3, ratio=0.3, neighbors=10):
     #     inliers = self.pcd.voxel_down_sample(voxel_size=voxel_size)
     #     _, index = inliers.remove_statistical_outlier(nb_neighbors=neighbors, std_ratio=ratio, print_progress=True)
         
@@ -134,40 +134,93 @@ class Test():
     #     self.pcd.points = o3d.utility.Vector3dVector(points)
     #     o3d.visualization.draw_geometries([self.pcd])
         
-    def test2(self):
-        _, inliers = self.pcd.segment_plane(distance_threshold=0.01,ransac_n=4,num_iterations=1000, seed=420)
-        inlier_pcd = self.pcd.select_by_index(inliers)        
-        clusters = self.clustering(inlier_pcd)
-        self.getLines(clusters, np.asarray(inlier_pcd.points))
+    # def test2(self):
+    #     _, inliers = self.pcd.segment_plane(distance_threshold=0.01,ransac_n=4,num_iterations=1000, seed=420)
+    #     inlier_pcd = self.pcd.select_by_index(inliers)        
+    #     clusters = self.clustering(inlier_pcd)
+    #     self.getLines(clusters, np.asarray(inlier_pcd.points))
         
         
-    def getLines(self, clusters, total):
-        x = [x for x, _, _ in total]
-        y = [y for _, y, _ in total]
-        plt.plot(x, y, 'ko')
-        for points in clusters:
-            # x_min = np.inf
-            # x_max = -np.inf
-            x_val = []
-            y_val = []
-            for x, y, _ in points:
-                # if x < x_min:
-                #     x_min = x
-                # elif x > x_max:
-                #     x_max = x
-                x_val.append(x)
-                y_val.append(y)
+    # def getLines(self, clusters, total):
+    #     x = [x for x, _, _ in total]
+    #     y = [y for _, y, _ in total]
+    #     plt.plot(x, y, 'ko')
+    #     for points in clusters:
+    #         # x_min = np.inf
+    #         # x_max = -np.inf
+    #         x_val = []
+    #         y_val = []
+    #         for x, y, _ in points:
+    #             # if x < x_min:
+    #             #     x_min = x
+    #             # elif x > x_max:
+    #             #     x_max = x
+    #             x_val.append(x)
+    #             y_val.append(y)
                 
-            x = np.array(x_val)
-            y = np.array(y_val)
+    #         x = np.array(x_val)
+    #         y = np.array(y_val)
             
-            a, b, c = np.polyfit(x,y,2)
+    #         a, b, c = np.polyfit(x,y,2)
             
-            plt.plot(x, y, 'o')
-            plt.plot(x, (a*x**2 + b*x + c))
-        plt.show()
+    #         plt.plot(x, y, 'o')
+    #         plt.plot(x, (a*x**2 + b*x + c))
+    #     plt.show()
+    
+    def test3(self):
+        ratio = 0.05
+        neighbors = 75
+        pcd = self.denoise(self.pcd, ratio, neighbors)
+        vox = self.voxel_down(pcd, 0.5)
+        new_neighbors = int(round((neighbors/3)))
+        pcd2 = self.denoise(vox, ratio, new_neighbors)
+        new_neighbors = int(round((neighbors/4.5)))
+        clust = self.clustering(pcd2, 0.8, new_neighbors)
+        # clust_ran = []
+        # plotter = pv.Plotter(window_size=(600, 400))
+        for c in clust:
+            pcd3 = o3d.geometry.PointCloud()
+            pcd3.points = o3d.utility.Vector3dVector(c)
+            o3d.visualization.draw_geometries([pcd3])
+            # max = pcd3.get_max_bound()
+            # min = pcd3.get_min_bound()
+            # pcd3.get_center(),
+            # print(f"max: {max} \tmin: {min}")
+            # diffX = np.abs(max[0]) - np.abs(min[0])
+            # diffY = np.abs(max[1]) - np.abs(min[1])
+            # if diffX > diffY:
+            #     min[1] = min[1] + (diffY/2)
+            #     max[1] = min[1] + 0.01
+            # else:
+            #     min[0] = min[0] + (diffY/2)
+            #     max[0] = min[0] + 0.01
+            # mesh = pv.Cube(bounds=(min[0], max[0], min[1], max[1], min[2], max[2]))
+            # plotter.add_mesh(mesh, show_edges=True, line_width=5)
+            
+            # _, inliers = pcd3.segment_plane(distance_threshold=0.01,ransac_n=4,num_iterations=1000, seed=420)
+            # clust_ran.append(pcd3.select_by_index(inliers))
+        o3d.visualization.draw_geometries(clust)
+        # plotter.show()
+            
         
-    def clustering(self, pcd, eps=0.3, min_points=10):
+    def voxel_down(self, pcd, voxel_size):
+        return pcd.voxel_down_sample(voxel_size=voxel_size)       
+
+        
+    def denoise(self, pcd, ratio=0.05, neighbors=100):    
+        _, index = pcd.remove_statistical_outlier(nb_neighbors=neighbors, std_ratio=ratio, print_progress=True)
+        
+        # Visualize, Removed points are Red and left once are Blue
+        inliers = pcd.select_by_index(index)
+        inliers.paint_uniform_color([0, 0, 1])
+        outlier = pcd.select_by_index(index, invert=True)
+        outlier.paint_uniform_color([1, 0, 0])
+        o3d.visualization.draw_geometries([inliers, outlier])
+        
+        inliers.paint_uniform_color([0, 0, 0])
+        return inliers
+        
+    def clustering(self, pcd, eps=0.4, min_points=50):
         def sort_on_labels(pcd):
             all_colors = []
             pcd_colors = np.asarray(pcd.colors)
@@ -180,10 +233,11 @@ class Test():
             for color in all_colors:
                 temp_arr = []
                 for index in range(len(pcd_colors)):
-                    if ((color == pcd_colors[index]).any()):
+                    if ((color == pcd_colors[index]).all()):
                         temp_arr.append(pcd_arr[index])
                 return_array.append(temp_arr)
             return return_array
+            
         
         def is_in(element, array):
             for ind in array:
@@ -209,6 +263,12 @@ class Test():
         colors = plt.get_cmap("tab20")(labels / (max_label if max_label > 0 else 1))
         colors[labels < 0] = 0
         pcd.colors = o3d.utility.Vector3dVector(colors[:, :3])
+        
+        o3d.visualization.draw_geometries([pcd],
+                                            zoom=0.8,
+                                            front=[-0.4999, -0.1659, -0.8499],
+                                            lookat=[2.1813, 2.0619, 2.0999],
+                                            up=[0.1204, -0.9852, 0.1215])
 
         return sort_on_labels(pcd)
 
