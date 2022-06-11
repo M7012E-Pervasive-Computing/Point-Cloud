@@ -19,9 +19,11 @@ class Test():
         
         self.test3()
 
-    # TODO allow connectLines to create multiple lines instead of force connect into one, should have distance threshold.
-    # TODO maybe add an optimizing  for angles of 90 degrees, so that it attempts to push points for lines so that they form better angles.
-    # TODO work on parameters (as much as possible to be generalized instead of selective)
+    # TODO 1. allow connectLines to create multiple lines instead of force connect into one, should have distance threshold.
+    # TODO 2. slice for height and link layers
+    # TODO 3. add shape to obj 
+    # TODO 4. maybe add an optimizing  for angles of 90 degrees, so that it attempts to push points for lines so that they form better angles.
+    # TODO 5. work on parameters (as much as possible to be generalized instead of selective)
     
     def test3(self):
         pcd = self.denoise(self.pcd, ratio=0.05, neighbors=75)
