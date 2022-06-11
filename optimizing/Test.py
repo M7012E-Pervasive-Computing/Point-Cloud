@@ -179,14 +179,9 @@ class Test():
         new_neighbors = int(round((neighbors/4.5)))
         clust = self.clustering(pcd2, 0.8, new_neighbors)
         lines = self.getLines(clust) 
-        polygon = self.connectLines(lines)
-        # x = []
-        # y = []
-        # for line in polygon:
-        #     for val_x, val_y in line:
-        #         x.append(val_x)
-        #         y.append(val_y)
-        res = rdp(polygon, epsilon=1)
+        
+        res = self.connectLines(lines)
+        res = rdp(res, epsilon=1)
         res.insert(0, res.pop())
         res = rdp(res, epsilon=1)
         res.append(res[0])
@@ -219,17 +214,21 @@ class Test():
             pcd_colors = np.asarray(pcd.colors)
             pcd_arr = np.asarray(pcd.points)
             return_array = []
+            rest_array = []
             for color in pcd_colors:
                 if (not is_in(color, all_colors)):
-                    if check_valid(color):
-                        all_colors.append(color)
+                    # if not_black(color):
+                    all_colors.append(color)
             for color in all_colors:
                 temp_arr = []
                 for index in range(len(pcd_colors)):
                     if ((color == pcd_colors[index]).all()):
                         temp_arr.append(pcd_arr[index])
-                return_array.append(temp_arr)
-            return return_array
+                if (is_black(color)):
+                    rest_array.extend(temp_arr)
+                else:
+                    return_array.append(temp_arr)
+            return return_array, rest_array
             
         
         def is_in(element, array):
@@ -238,12 +237,12 @@ class Test():
                     return True
             return False
         
-        def check_valid(color):
+        def is_black(color):
             r, g, b = color
             if r == 0 and g == 0 and b == 0:
-                return False
-            else:
                 return True
+            else:
+                return False
         
         with o3d.utility.VerbosityContextManager(
             o3d.utility.VerbosityLevel.Debug) as cm:
@@ -262,8 +261,14 @@ class Test():
                                             front=[-0.4999, -0.1659, -0.8499],
                                             lookat=[2.1813, 2.0619, 2.0999],
                                             up=[0.1204, -0.9852, 0.1215])
-
-        return sort_on_labels(pcd)
+        
+        sorted_arr, rest_arr = sort_on_labels(pcd)
+        if min_points > 10 and len(rest_arr) > 0:
+            pcd = o3d.geometry.PointCloud()
+            pcd.points = o3d.utility.Vector3dVector(rest_arr) 
+            sorted_rest = self.clustering(pcd, eps, int(round(min_points/2)))
+            sorted_arr.extend(sorted_rest)
+        return sorted_arr
     
     def getLines(self, clusters):
         lines = []
@@ -322,7 +327,6 @@ class Test():
             else: 
                 points.extend(best)
                 lines.pop(idx)
-        # points.append(points[0])
         return points
             
                 
