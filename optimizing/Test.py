@@ -7,6 +7,7 @@ import numpy as np
 from numpy import linalg as npl
 import copy
 import matplotlib.pyplot as plt
+from math import atan2, degrees, pi
 from rdp import rdp
 
 from optimizing.Clustering import Clustering
@@ -180,13 +181,11 @@ class Test():
         clust = self.clustering(pcd2, 0.8, new_neighbors)
         lines = self.getLines(clust) 
         
-        res = self.connectLines(lines)
-        res = rdp(res, epsilon=1)
-        res.insert(0, res.pop())
-        res = rdp(res, epsilon=1)
-        res.append(res[0])
-        x = [x for x, _ in res]
-        y = [y for _, y in res]
+        line = self.connectLines(lines)
+        simplified_line = self.rdp_angle(line)
+        
+        x = [x for x, _ in simplified_line]
+        y = [y for _, y in simplified_line]
         plt.plot(x,y)
         plt.show()
                 
@@ -302,6 +301,21 @@ class Test():
             x2, y2 = p2
             return np.sqrt((y2-y1)**2 + (x2-x1)**2) 
                 
+        def sortLongest(lines):
+            sorted_lines = []
+            while len(lines) > 0:
+                longest = -np.inf
+                best = None
+                for idx, line in enumerate(lines):
+                    p1, p2 = line
+                    dist = distPoints(p1, p2)
+                    if dist > longest:
+                        longest = dist
+                        best = idx
+                sorted_lines.append(lines.pop(best))
+            return sorted_lines
+                
+        lines = sortLongest(lines)  
         points = lines[0]
         lines.pop(0)
         while len(lines) > 0: 
@@ -329,6 +343,59 @@ class Test():
                 lines.pop(idx)
         return points
             
+    def rdp_angle(self, line, dist_threshold=1.25, angle_divider=2):
+        def points_angle(A, B, C):
+            Ax, Ay = A[0]-B[0], A[1]-B[1]
+            Cx, Cy = C[0]-B[0], C[1]-B[1]
+            a = atan2(Ay, Ax)
+            c = atan2(Cy, Cx)
+            a += pi*2 if a < 0 else 0 
+            c += pi*2 if c < 0 else 0
+            angle = (pi*2 + c - a) if a > c else (c - a)
+            return degrees(angle)
+        
+        def point_line_distance(A, B, C):
+            return npl.norm(np.cross(C-A, A-B))/npl.norm(C-A)
+        
+        while True:
+            length = len(line) - 1
+            
+            largestDiff = -np.inf
+            idx = None
+            for i in range(1, length):
+                A = np.array(line[(i-1) % length])
+                B = np.array(line[i])
+                C = np.array(line[(i+2) % length])
+                
+                angle = points_angle(A, B, C)
+                dist = point_line_distance(A, B, C)            
+                dist = (dist / angle_divider) if angle < 70 else dist
+                dist = (dist / angle_divider) if angle < 50 else dist
+                dist = (dist / angle_divider) if angle < 30 else dist
+            
+                if dist < dist_threshold: 
+                    diff = dist_threshold - dist
+                    if diff > largestDiff:
+                        largestDiff = diff
+                        idx = i
+                        
+            if idx is None: 
+                if len(line) > 0: 
+                    line.append(line[0])
+                return line
+            line.pop(idx)
+                
+                
+                        
+                    
+                    
+                
+                
+                
+                
+                
+                
+                
                 
         
         
