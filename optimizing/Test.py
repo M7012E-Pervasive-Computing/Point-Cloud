@@ -180,12 +180,15 @@ class Test():
         clust = self.clustering(pcd2, 0.8, new_neighbors)
         lines = self.getLines(clust) 
         polygon = self.connectLines(lines)
-        x = []
-        y = []
-        for line in polygon:
-            for val_x, val_y in line:
-                x.append(val_x)
-                y.append(val_y)
+        # x = []
+        # y = []
+        # for line in polygon:
+        #     for val_x, val_y in line:
+        #         x.append(val_x)
+        #         y.append(val_y)
+        res = rdp(polygon, epsilon=0.2)
+        x = [x for x, _ in res]
+        y = [y for _, y in res]
         plt.plot(x,y)
         plt.show()
                 
@@ -291,39 +294,66 @@ class Test():
             x2, y2 = p2
             return np.sqrt((y2-y1)**2 + (x2-x1)**2) 
         
-        def findClosest(p1, points):
-            bestDist = np.inf
-            bestPoint = points[0]
-            for p2 in points:
-                dist = distPoints(p1, p2)
-                if dist < bestDist:
-                    bestDist = dist
-                    bestPoint = p2
-            return bestPoint, bestDist
+        # def findClosest(p1, points):
+        #     bestDist = np.inf
+        #     bestPoint = points[0]
+        #     for p2 in points:
+        #         dist = distPoints(p1, p2)
+        #         if dist < bestDist:
+        #             bestDist = dist
+        #             bestPoint = p2
+        #     return bestPoint, bestDist
         
-        lines2 = []
-        for line in copy.deepcopy(lines):
-            points = []
-            [points.extend(x) for x in copy.deepcopy(lines) if x != line]
-            c1, dist1 = findClosest(line[0], points)
-            c2, dist2 = findClosest(line[1], points)
+        # lines2 = []
+        # for line in copy.deepcopy(lines):
+        #     points = []
+        #     [points.extend(x) for x in copy.deepcopy(lines) if x != line]
+        #     c1, dist1 = findClosest(line[0], points)
+        #     c2, dist2 = findClosest(line[1], points)
             
-            if c1 == c2: 
-                points.remove(c1)
-                if dist1 > dist2:
-                    c1, dist1 = findClosest(line[0], points)
-                else: 
-                    c2, dist2 = findClosest(line[1], points)
-            del points
+        #     if c1 == c2: 
+        #         points.remove(c1)
+        #         if dist1 > dist2:
+        #             c1, dist1 = findClosest(line[0], points)
+        #         else: 
+        #             c2, dist2 = findClosest(line[1], points)
+        #     del points
 
-            new_line = copy.deepcopy(line)
-            if dist1 != 0:
-                new_line.insert(0, c1)
-            if dist2 != 0:
-                new_line.append(c2)
-            lines2.append(new_line)
-            print(new_line)
-        return lines2
+        #     new_line = copy.deepcopy(line)
+        #     if dist1 != 0:
+        #         new_line.insert(0, c1)
+        #     if dist2 != 0:
+        #         new_line.append(c2)
+        #     lines2.append(new_line)
+        #     print(new_line)
+        
+        points = lines[0]
+        lines.pop(0)
+        while len(lines) > 0: 
+            p = points[-1]
+            bestDist = np.inf
+            best = None
+            idx = None 
+            for i, [p1, p2] in enumerate(lines):
+                dist1 = distPoints(p, p1)
+                dist2 = distPoints(p, p2)
+                if dist1 < dist2: 
+                    if dist1 < bestDist:
+                        bestDist = dist1
+                        best = [p1,p2]
+                        idx = i
+                else:
+                    if dist2 < bestDist:
+                        bestDist = dist1
+                        best = [p2,p1]
+                        idx = i 
+            if best is None: 
+                continue
+            else: 
+                points.extend(best)
+                lines.pop(idx)
+        # points.append(points[0])
+        return points
             
                 
         
