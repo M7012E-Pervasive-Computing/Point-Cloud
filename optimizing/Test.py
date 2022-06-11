@@ -186,7 +186,10 @@ class Test():
         #     for val_x, val_y in line:
         #         x.append(val_x)
         #         y.append(val_y)
-        res = rdp(polygon, epsilon=0.2)
+        res = rdp(polygon, epsilon=1)
+        res.insert(0, res.pop())
+        res = rdp(res, epsilon=1)
+        res.append(res[0])
         x = [x for x, _ in res]
         y = [y for _, y in res]
         plt.plot(x,y)
@@ -285,7 +288,7 @@ class Test():
             plt.plot(x, y, 'o')
             plt.plot(x, (a*x + b))
             lines.append([[x1, y1], [x2, y2]])
-        plt.show()
+        # plt.show()
         return lines
     
     def connectLines(self, lines):
@@ -293,40 +296,7 @@ class Test():
             x1, y1 = p1
             x2, y2 = p2
             return np.sqrt((y2-y1)**2 + (x2-x1)**2) 
-        
-        # def findClosest(p1, points):
-        #     bestDist = np.inf
-        #     bestPoint = points[0]
-        #     for p2 in points:
-        #         dist = distPoints(p1, p2)
-        #         if dist < bestDist:
-        #             bestDist = dist
-        #             bestPoint = p2
-        #     return bestPoint, bestDist
-        
-        # lines2 = []
-        # for line in copy.deepcopy(lines):
-        #     points = []
-        #     [points.extend(x) for x in copy.deepcopy(lines) if x != line]
-        #     c1, dist1 = findClosest(line[0], points)
-        #     c2, dist2 = findClosest(line[1], points)
-            
-        #     if c1 == c2: 
-        #         points.remove(c1)
-        #         if dist1 > dist2:
-        #             c1, dist1 = findClosest(line[0], points)
-        #         else: 
-        #             c2, dist2 = findClosest(line[1], points)
-        #     del points
-
-        #     new_line = copy.deepcopy(line)
-        #     if dist1 != 0:
-        #         new_line.insert(0, c1)
-        #     if dist2 != 0:
-        #         new_line.append(c2)
-        #     lines2.append(new_line)
-        #     print(new_line)
-        
+                
         points = lines[0]
         lines.pop(0)
         while len(lines) > 0: 
