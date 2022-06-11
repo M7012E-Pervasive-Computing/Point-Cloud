@@ -5,7 +5,7 @@ import pyvista as pv
 import numpy as np
 import copy
 import matplotlib.pyplot as plt
-import rdp
+from rdp import rdp
 
 from optimizing.Clustering import Clustering
 
@@ -176,32 +176,7 @@ class Test():
         pcd2 = self.denoise(vox, ratio, new_neighbors)
         new_neighbors = int(round((neighbors/4.5)))
         clust = self.clustering(pcd2, 0.8, new_neighbors)
-        # clust_ran = []
-        # plotter = pv.Plotter(window_size=(600, 400))
-        for c in clust:
-            pcd3 = o3d.geometry.PointCloud()
-            pcd3.points = o3d.utility.Vector3dVector(c)
-            o3d.visualization.draw_geometries([pcd3])
-            # max = pcd3.get_max_bound()
-            # min = pcd3.get_min_bound()
-            # pcd3.get_center(),
-            # print(f"max: {max} \tmin: {min}")
-            # diffX = np.abs(max[0]) - np.abs(min[0])
-            # diffY = np.abs(max[1]) - np.abs(min[1])
-            # if diffX > diffY:
-            #     min[1] = min[1] + (diffY/2)
-            #     max[1] = min[1] + 0.01
-            # else:
-            #     min[0] = min[0] + (diffY/2)
-            #     max[0] = min[0] + 0.01
-            # mesh = pv.Cube(bounds=(min[0], max[0], min[1], max[1], min[2], max[2]))
-            # plotter.add_mesh(mesh, show_edges=True, line_width=5)
-            
-            # _, inliers = pcd3.segment_plane(distance_threshold=0.01,ransac_n=4,num_iterations=1000, seed=420)
-            # clust_ran.append(pcd3.select_by_index(inliers))
-        o3d.visualization.draw_geometries(clust)
-        # plotter.show()
-            
+        lines = self.getLines(clust) 
         
     def voxel_down(self, pcd, voxel_size):
         return pcd.voxel_down_sample(voxel_size=voxel_size)       
@@ -271,6 +246,54 @@ class Test():
                                             up=[0.1204, -0.9852, 0.1215])
 
         return sort_on_labels(pcd)
+    
+    def getLines(self, clusters):
+        lines = []
+        for cluster in clusters:
+            x, y = [], []
+            x1 = np.inf
+            x2 = -np.inf
+            for val_x, val_y, _ in cluster:
+                x.append(val_x)
+                y.append(val_y)
+                x1 = val_x if val_x < x1 else x1
+                x2 = val_x if val_x > x2 else x2
+                
+            x = np.array(x)
+            y = np.array(y)
+
+            a, b = np.polyfit(x,y,1)
+            
+            y1 = a*x1 + b
+            y2 = a*x2 + b
+            
+            plt.plot(x, y, 'o')
+            plt.plot(x, (a*x + b))
+            lines.append([[x1, y1], [x2, y2]])
+        plt.show()
+        return lines
+    
+    def connectLines(self, lines, dist):
+        
+        def distPoints(p1, p2):
+            x1, y1 = p1
+            x2, y2 = p2
+            return np.sqrt((y2-y1)**2 + (x2-y1)**2) 
+        
+        def distLines(line1, line2):
+            p1, p2 = line1
+            p3, p4 = line2
+            
+        
+        for line1 in lines:
+            for line2 in lines:
+                if line1 == line2:
+                    continue
+            
+                
+                
+            
+    
 
         
         
