@@ -1,8 +1,10 @@
+from dis import dis
 from operator import invert
 from turtle import distance
 import open3d as o3d
 import pyvista as pv
 import numpy as np
+from numpy import linalg as npl
 import copy
 import matplotlib.pyplot as plt
 from rdp import rdp
@@ -177,6 +179,16 @@ class Test():
         new_neighbors = int(round((neighbors/4.5)))
         clust = self.clustering(pcd2, 0.8, new_neighbors)
         lines = self.getLines(clust) 
+        polygon = self.connectLines(lines)
+        x = []
+        y = []
+        for line in polygon:
+            for val_x, val_y in line:
+                x.append(val_x)
+                y.append(val_y)
+        plt.plot(x,y)
+        plt.show()
+                
         
     def voxel_down(self, pcd, voxel_size):
         return pcd.voxel_down_sample(voxel_size=voxel_size)       
@@ -273,23 +285,55 @@ class Test():
         plt.show()
         return lines
     
-    def connectLines(self, lines, dist):
-        
+    def connectLines(self, lines):
         def distPoints(p1, p2):
             x1, y1 = p1
             x2, y2 = p2
-            return np.sqrt((y2-y1)**2 + (x2-y1)**2) 
+            return np.sqrt((y2-y1)**2 + (x2-x1)**2) 
         
-        def distLines(line1, line2):
-            p1, p2 = line1
-            p3, p4 = line2
-            
+        def findClosest(p1, points):
+            bestDist = np.inf
+            bestPoint = points[0]
+            for p2 in points:
+                dist = distPoints(p1, p2)
+                if dist < bestDist:
+                    bestDist = dist
+                    bestPoint = p2
+            return bestPoint, bestDist
         
-        for line1 in lines:
-            for line2 in lines:
-                if line1 == line2:
-                    continue
+        lines2 = []
+        for line in copy.deepcopy(lines):
+            points = []
+            [points.extend(x) for x in copy.deepcopy(lines) if x != line]
+            c1, dist1 = findClosest(line[0], points)
+            c2, dist2 = findClosest(line[1], points)
             
+            if c1 == c2: 
+                points.remove(c1)
+                if dist1 > dist2:
+                    c1, dist1 = findClosest(line[0], points)
+                else: 
+                    c2, dist2 = findClosest(line[1], points)
+            del points
+
+            new_line = copy.deepcopy(line)
+            if dist1 != 0:
+                new_line.insert(0, c1)
+            if dist2 != 0:
+                new_line.append(c2)
+            lines2.append(new_line)
+            print(new_line)
+        return lines2
+            
+                
+        
+        
+                    
+            
+                    
+                
+                
+                
                 
                 
             
