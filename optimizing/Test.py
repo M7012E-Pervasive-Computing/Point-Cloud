@@ -1,14 +1,14 @@
 from dis import dis
-from operator import invert
-from turtle import distance
+# from operator import invert
+# from turtle import distance
 import open3d as o3d
-import pyvista as pv
+# import pyvista as pv
 import numpy as np
 from numpy import linalg as npl
-import copy
+# import copy
 import matplotlib.pyplot as plt
 from math import atan2, degrees, pi
-from rdp import rdp
+# from rdp import rdp
 
 
 class Test():
@@ -146,7 +146,7 @@ class Test():
         # plt.show()
         return lines
     
-    def connectLines(self, lines):
+    def connectLines(self, lines):  #? Add distance threshold parameter
         def distPoints(p1, p2):
             x1, y1 = p1
             x2, y2 = p2
@@ -167,16 +167,16 @@ class Test():
             return sorted_lines
                 
         lines = sortLongest(lines)  
-        points = lines[0]
+        points = lines[0]   #? List of points which connect into one line 
         lines.pop(0)
         while len(lines) > 0: 
             p = points[-1]
             bestDist = np.inf
             best = None
             idx = None 
-            for i, [p1, p2] in enumerate(lines):
-                dist1 = distPoints(p, p1)
-                dist2 = distPoints(p, p2)
+            for i, [p1, p2] in enumerate(lines):    
+                dist1 = distPoints(p, p1)   #? Check if the distances are larger then distance threshold
+                dist2 = distPoints(p, p2)   #? ^
                 if dist1 < dist2: 
                     if dist1 < bestDist:
                         bestDist = dist1
@@ -188,13 +188,14 @@ class Test():
                         best = [p2,p1]
                         idx = i 
             if best is None: 
-                continue
+                continue    #? instead of having the current list "points" have a list where one index would be the current "points".
+                            #? Then instead of continue we append to that new list.
             else: 
                 points.extend(best)
                 lines.pop(idx)
         return points
             
-    def rdp_angle(self, line, dist_threshold, angle_divider):
+    def rdp_angle(self, line, dist_threshold, angle_divider):   # Based on idea of rdp algorithm 
         def points_angle(A, B, C):
             Ax, Ay = A[0]-B[0], A[1]-B[1]
             Cx, Cy = C[0]-B[0], C[1]-B[1]
@@ -220,8 +221,8 @@ class Test():
                 
                 angle = points_angle(A, B, C)
                 dist = point_line_distance(A, B, C)            
-                dist = (dist / angle_divider) if angle < 70 else dist
-                dist = (dist / angle_divider) if angle < 50 else dist
+                dist = (dist / angle_divider) if angle < 70 else dist   # Done since this algorithm will generally struggle with smaller angles
+                dist = (dist / angle_divider) if angle < 50 else dist   # To make simplification more accurate
                 dist = (dist / angle_divider) if angle < 30 else dist
             
                 if dist < dist_threshold: 
@@ -235,41 +236,3 @@ class Test():
                     line.append(line[0])
                 return line
             line.pop(idx)
-                
-                
-                        
-                    
-                    
-                
-                
-                
-                
-                
-                
-                
-                
-        
-        
-                    
-            
-                    
-                
-                
-                
-                
-                
-            
-    
-
-        
-        
-        
-                
-    
-     
-            
-        
-    
-        
-        
-        
