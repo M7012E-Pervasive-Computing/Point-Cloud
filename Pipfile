@@ -8,6 +8,7 @@ numpy = "*"
 vtk = "*"
 open3d = "==0.14.1"
 requests = "*"
+scipy = "*"
 
 [dev-packages]
 

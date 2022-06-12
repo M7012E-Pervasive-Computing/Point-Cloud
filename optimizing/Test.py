@@ -32,7 +32,7 @@ class Test():
         
         clust = self.clustering(pcd=pcd2, eps=0.8, min_points=75)
         
-        lines = self.getLines(clust) 
+        lines = self.getLines(clust)
         line = self.connectLines(lines) 
         simplified_line = self.rdp_angle(line, dist_threshold=1, angle_divider=2)
         
@@ -54,7 +54,7 @@ class Test():
         inliers.paint_uniform_color([0, 0, 1])
         outlier = pcd.select_by_index(index, invert=True)
         outlier.paint_uniform_color([1, 0, 0])
-        o3d.visualization.draw_geometries([inliers, outlier])
+        # o3d.visualization.draw_geometries([inliers, outlier])
         
         inliers.paint_uniform_color([0, 0, 0])
         return inliers
@@ -106,11 +106,11 @@ class Test():
         colors[labels < 0] = 0
         pcd.colors = o3d.utility.Vector3dVector(colors[:, :3])
         
-        o3d.visualization.draw_geometries([pcd],
-                                            zoom=0.8,
-                                            front=[-0.4999, -0.1659, -0.8499],
-                                            lookat=[2.1813, 2.0619, 2.0999],
-                                            up=[0.1204, -0.9852, 0.1215])
+        # o3d.visualization.draw_geometries([pcd],
+        #                                     zoom=0.8,
+        #                                     front=[-0.4999, -0.1659, -0.8499],
+        #                                     lookat=[2.1813, 2.0619, 2.0999],
+        #                                     up=[0.1204, -0.9852, 0.1215])
         
         sorted_arr, rest_arr = sort_on_labels(pcd)
         if min_points > 10 and len(rest_arr) > 0:
@@ -146,12 +146,13 @@ class Test():
         # plt.show()
         return lines
     
-    def connectLines(self, lines):  #? Add distance threshold parameter
+    def connectLines(self, lines, dist_threshold=100):  #? Add distance threshold parameter
+        # returns the distance between two points
         def distPoints(p1, p2):
             x1, y1 = p1
             x2, y2 = p2
             return np.sqrt((y2-y1)**2 + (x2-x1)**2) 
-                
+        # sort lines by length, longest first
         def sortLongest(lines):
             sorted_lines = []
             while len(lines) > 0:
@@ -167,33 +168,54 @@ class Test():
             return sorted_lines
                 
         lines = sortLongest(lines)  
-        points = lines[0]   #? List of points which connect into one line 
-        lines.pop(0)
-        while len(lines) > 0: 
-            p = points[-1]
+        linePoints = [] #lines[0]   #? List of points which connect into one line
+        points = []
+        linesNotConnected = []
+        # lines.pop(0)
+        index = 0
+        while len(lines) > 0:
+        # for j in range(len(lines)):
+            # print(f'lines {lines}')
+            # [[[-4.326523325910202, 4.112942065701998], [-2.7981938426394137, 4.760742700542908]], [[-3.824925814910727, 1.677210610530008], [-2.8898910302133207, 1.8824424634110066]]]
+            print(lines[index])
             bestDist = np.inf
             best = None
-            idx = None 
-            for i, [p1, p2] in enumerate(lines):    
-                dist1 = distPoints(p, p1)   #? Check if the distances are larger then distance threshold
-                dist2 = distPoints(p, p2)   #? ^
-                if dist1 < dist2: 
-                    if dist1 < bestDist:
-                        bestDist = dist1
-                        best = [p1,p2]
-                        idx = i
-                else:
-                    if dist2 < bestDist:
-                        bestDist = dist1
-                        best = [p2,p1]
-                        idx = i 
-            if best is None: 
+            idx = None
+            for k in range(2):
+                print(lines[index][k])
+                p = lines[index][k]
+                for i, [p1, p2] in enumerate(lines[0:index] + lines[index+1:]):
+                    dist1 = distPoints(p, p1)   #? Check if the distances are larger then distance threshold
+                    dist2 = distPoints(p, p2)   #? ^
+                    # print(f'p1 {p1} p2 {p2} dist1 {dist1} dist2 {dist2}')
+                    if dist1 < dist_threshold and dist2 < dist_threshold:
+                        if dist1 < bestDist or dist2 < bestDist: # if the distance is less then the current best
+                            if dist1 < dist2: # if dist1 is less then dist2 then we use dist1
+                                bestDist = dist1
+                                best = [p1,p2]
+                                idx = i
+                            else: # otherwise dist1 
+                                bestDist = dist1
+                                best = [p2,p1]
+                                idx = i
+                    else:
+                        continue
+            # print(f'best is {best}')
+            if best is None: # or distPoints(best[0], best[1]) > dist_threshold:
+                linesNotConnected.append(p)
+                lines.pop(index)
+                index += 1
                 continue    #? instead of having the current list "points" have a list where one index would be the current "points".
                             #? Then instead of continue we append to that new list.
-            else: 
-                points.extend(best)
+            else:
+                linePoints.extend(best)
                 lines.pop(idx)
-        return points
+                index += 1
+            if index >= len(lines):
+                index = 0
+                # j -= 1
+        # print(f'return points {linePoints}')
+        return linePoints
             
     def rdp_angle(self, line, dist_threshold, angle_divider):   # Based on idea of rdp algorithm 
         def points_angle(A, B, C):
