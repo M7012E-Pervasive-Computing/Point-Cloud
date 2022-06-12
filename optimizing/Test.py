@@ -34,12 +34,42 @@ class Test():
         
         lines = self.getLines(clust) 
         line = self.connectLines(lines, distance_threshold=2) 
+        simplified_lines = []
         for l in line:
             simplified_line = self.rdp_angle(l, dist_threshold=1.5, angle_multiplier=1.25)
             x = [x for x, _ in simplified_line]
             y = [y for _, y in simplified_line]
+            x.append(x[0])
+            y.append(y[0])
             plt.plot(x, y)
+            simplified_lines.append(simplified_line)
+        
+        v, e = self.getPlanes(0, 10, simplified_lines)
+        print(v)
+        print(e)
+    
         plt.show()
+        
+    def getPlanes(self, min_z, max_z, lines):
+        vertices = []
+        faces = []
+        for line in lines:
+            for i in range(1, len(line)):
+                x1, y1 = line[i-1]
+                x2, y2 = line[i]
+                face = []
+                face_vertices = [[x1, y1, max_z], [x2, y2, max_z], [x2, y2, min_z], [x1, y1, min_z]]
+                for v in face_vertices:
+                    if v in vertices:
+                        face.append(vertices.index(v))
+                    else:
+                        face.append(len(vertices))
+                        vertices.append(v)
+                faces.append(face)
+        return vertices, faces
+                
+                
+        
                 
         
     def voxel_down(self, pcd, voxel_size):
