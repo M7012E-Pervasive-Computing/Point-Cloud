@@ -33,12 +33,9 @@ class Test():
         clust = self.clustering(pcd=pcd2, eps=0.8, min_points=75)
         
         lines = self.getLines(clust) 
-        line = self.connectLines(lines, distance_threshold=1.5) 
+        line = self.connectLines(lines, distance_threshold=2) 
         for l in line:
-            if len(l) >= 3:
-                simplified_line = self.rdp_angle(l, dist_threshold=1, angle_multiplier=1.25)
-            else: 
-                simplified_line = l
+            simplified_line = self.rdp_angle(l, dist_threshold=1.5, angle_multiplier=1.25)
             x = [x for x, _ in simplified_line]
             y = [y for _, y in simplified_line]
             plt.plot(x, y)
@@ -144,7 +141,7 @@ class Test():
             y2 = a*x2 + b
             
             plt.plot(x, y, 'o')
-            plt.plot(x, (a*x + b))
+            # plt.plot(x, (a*x + b))
             lines.append([[x1, y1], [x2, y2]])
         # plt.show()
         return lines
@@ -171,31 +168,35 @@ class Test():
         
         lines = sortLongest(lines)  
         connected_lines = [lines.pop(0)]
+        has_reversed = False
         while len(lines) > 0: 
             point = connected_lines[-1][-1]
-            bestDist = np.inf
+            best_distance = np.inf
             best = None
             idx = None 
-            for i, [p1, p2] in enumerate(lines):    
-                dist1 = distPoints(point, p1)  
-                dist2 = distPoints(point, p2) 
-                dist1 = np.inf if dist1 > distance_threshold else dist1
-                dist2 = np.inf if dist2 > distance_threshold else dist2  
-                if dist1 < dist2: 
-                    if dist1 < bestDist:
-                        bestDist = dist1
-                        best = [p1,p2]
-                        idx = i
-                else:
-                    if dist2 < bestDist:
-                        bestDist = dist1
-                        best = [p2,p1]
-                        idx = i 
+            for i, line in enumerate(lines): 
+                distance = [distPoints(point, x) for x in line]
+                distance = [np.inf if x > distance_threshold else x for x in distance]
+                if distance[0] < distance[1] and distance[0] < best_distance:
+                    best_distance = distance[0]
+                    best = line
+                    idx = i
+                elif distance[1] < best_distance:
+                    best_distance = distance[1]
+                    line.reverse()
+                    best = line
+                    idx = i
             if best is None: 
-                connected_lines.append(lines.pop(0))
+                if has_reversed:
+                    connected_lines.append(lines.pop(0))
+                    has_reversed = False
+                else:
+                    connected_lines[-1].reverse()
+                    has_reversed = True
             else: 
                 connected_lines[-1].extend(best)
                 lines.pop(idx)
+                has_reversed = False
         return connected_lines
             
     def rdp_angle(self, line, dist_threshold, angle_multiplier):   # Based on idea of rdp algorithm 
