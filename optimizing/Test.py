@@ -8,6 +8,7 @@ from numpy import linalg as npl
 # import copy
 import matplotlib.pyplot as plt
 from math import atan2, degrees, pi
+from optimizing.Store import Store
 # from rdp import rdp
 
 
@@ -53,6 +54,11 @@ class Test():
                 file.write(f"v {v[0]} {v[1]} {v[2]}\n")
             for f in faces:
                 file.write(f"f {f[0]} {f[1]} {f[2]} {f[3]}\n")
+        v, e = self.getPlanes(0, 10, simplified_lines)
+        print(v)
+        print(e)
+        
+        Store().storeRoom(v, e)
     
         plt.show()
         
