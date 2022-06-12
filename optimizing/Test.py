@@ -40,26 +40,15 @@ class Test():
             simplified_line = self.rdp_angle(l, dist_threshold=1.5, angle_multiplier=1.25)
             x = [x for x, _ in simplified_line]
             y = [y for _, y in simplified_line]
-            x.append(x[0])
-            y.append(y[0])
             plt.plot(x, y)
             simplified_lines.append(simplified_line)
         
         vertices, faces = self.getPlanes(0, 10, simplified_lines)
-        # print(v)
-        # print(e)
-    
         with open("./test.obj", 'w') as file:
             for v in vertices:
                 file.write(f"v {v[0]} {v[1]} {v[2]}\n")
             for f in faces:
                 file.write(f"f {f[0]} {f[1]} {f[2]} {f[3]}\n")
-        v, e = self.getPlanes(0, 10, simplified_lines)
-        print(v)
-        print(e)
-        
-        Store().storeRoom(v, e)
-    
         plt.show()
         
     def getPlanes(self, min_z, max_z, lines):
@@ -236,7 +225,16 @@ class Test():
                 connected_lines[-1].extend(best)
                 lines.pop(idx)
                 has_reversed = False
-        return connected_lines
+                
+        res = []
+        for line in connected_lines:
+            if len(line) >= 3:
+                distance = distPoints(line[0], line[-1])
+                if distance <= distance_threshold:
+                    line.append(line[0])
+            res.append(line)
+        
+        return res
             
     def rdp_angle(self, line, dist_threshold, angle_multiplier):   # Based on idea of rdp algorithm 
         def points_angle(A, B, C):
