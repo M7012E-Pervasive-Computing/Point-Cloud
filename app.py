@@ -87,7 +87,8 @@ class App:
         for i in range(len(sessions)):
             # sessions_str += '[' + str(i + 1) + '] ' + str(sessions[i]) + '\n' # Old service
             sessions_str += '[' + str(i + 1) + '] ' + str(sessions[i]['sessionName']) + '\n' # New service
-        session_picked = self._get_int_input(len(sessions), sessions_str)
+        # session_picked = self._get_int_input(len(sessions), sessions_str)
+        session_picked = 25
         
         # return sessions[session_picked - 1] # Old service
         return sessions[session_picked - 1]['sessionName'] # new service

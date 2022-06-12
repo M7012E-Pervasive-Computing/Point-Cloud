@@ -1,5 +1,4 @@
 from dis import dis
-import imp
 # from operator import invert
 # from turtle import distance
 import open3d as o3d
@@ -31,23 +30,80 @@ class Test():
         pcd = self.denoise(self.pcd, ratio=0.05, neighbors=75)
         vox = self.voxel_down(pcd=pcd, voxel_size=0.5)
         pcd2 = self.denoise(pcd=vox, ratio=0.05, neighbors=25)
+                
+        cluster = self.clustering(pcd=pcd2, eps=0.8, min_points=75)
         
-        clust = self.clustering(pcd=pcd2, eps=0.8, min_points=75)
+        cluster = self.setClusterForHeight(
+            cluster,
+            minValue=pcd.get_min_bound()[2],
+            maxValue=pcd.get_max_bound()[2],
+            divider=0.2)
         
-        lines = self.getLines(clust) 
-        line = self.connectLines(lines, distance_threshold=2) 
+        # lines = self.getLines(clust) 
+        # line = self.connectLines(lines, distance_threshold=2) 
+        # simplified_lines = []
+        # for l in line:
+        #     simplified_line = self.rdp_angle(l, dist_threshold=1.5, angle_multiplier=1.25)
+        #     x = [x for x, _ in simplified_line]
+        #     y = [y for _, y in simplified_line]
+        #     x.append(x[0])
+        #     y.append(y[0])
+        #     plt.plot(x, y)
+        #     simplified_lines.append(simplified_line)
+        
+        clusterData = [[] for _ in range(len(cluster))]
+        for i in range(len(cluster)):
+            for j in range(len(cluster[i])):
+                clusterData[i].append(cluster[i][j])
+        
+        allLines = []
         simplified_lines = []
-        for l in line:
-            simplified_line = self.rdp_angle(l, dist_threshold=1.5, angle_multiplier=1.25)
-            x = [x for x, _ in simplified_line]
-            y = [y for _, y in simplified_line]
-            plt.plot(x, y)
-            simplified_lines.append(simplified_line)
+        for i in range(len(clusterData)):
+            if len(clusterData[i]) == 0:
+                continue
+            lines = self.getLines(np.asarray(clusterData[i]))
+            lines = self.connectLines(lines, distance_threshold=2) 
+            allLines.append(lines)
+            for l in lines:
+                simplified_line = self.rdp_angle(l, dist_threshold=1.5, angle_multiplier=1.25)
+                simplified_lines.append(simplified_line)
+        # lines = self.getLines(cluster) 
+        # for l in lines:
+        #     simplified_line = self.rdp_angle(l, dist_threshold=1.5, angle_multiplier=1.25)
+        #     x = [x for x, _ in simplified_line]
+        #     y = [y for _, y in simplified_line]
+        #     x.append(x[0])
+        #     y.append(y[0])
+        #     plt.plot(x, y)
+        #     simplified_lines.append(simplified_line)
         
-        vertices, faces = self.getPlanes(0, 10, simplified_lines)
-        Store().storeRoom(vertices, faces)
+        v, e = self.getPlanes(pcd.get_min_bound()[2], pcd.get_max_bound()[2], simplified_lines)
+        print(v)
+        print(e)
+        
+        Store().storeRoom(v, e)
+    
         plt.show()
-        
+    
+    def setClusterForHeight(self, clusters, minValue, maxValue, divider=0.2):
+        returnCluster = []
+        # print(clusters)
+        for cluster in clusters:
+            newCluster = []
+            cluster = np.asarray(cluster)
+            jump = (maxValue - minValue) * divider
+            numberOfJumps = int((maxValue - minValue) / jump)
+            for i in range(numberOfJumps):
+                newCluster2 = []
+                for val in cluster:
+                    if (val[2] > minValue + jump * i) and (val[2] < maxValue - jump * (numberOfJumps - i - 1)):
+                        newCluster2.append(val)
+                newCluster.append(newCluster2)
+            returnCluster.append(newCluster)
+            # print(newCluster)
+        return returnCluster
+            
+    
     def getPlanes(self, min_z, max_z, lines):
         vertices = []
         faces = []
@@ -79,7 +135,7 @@ class Test():
         inliers.paint_uniform_color([0, 0, 1])
         outlier = pcd.select_by_index(index, invert=True)
         outlier.paint_uniform_color([1, 0, 0])
-        o3d.visualization.draw_geometries([inliers, outlier])
+        # o3d.visualization.draw_geometries([inliers, outlier])
         
         inliers.paint_uniform_color([0, 0, 0])
         return inliers
@@ -131,11 +187,11 @@ class Test():
         colors[labels < 0] = 0
         pcd.colors = o3d.utility.Vector3dVector(colors[:, :3])
         
-        o3d.visualization.draw_geometries([pcd],
-                                            zoom=0.8,
-                                            front=[-0.4999, -0.1659, -0.8499],
-                                            lookat=[2.1813, 2.0619, 2.0999],
-                                            up=[0.1204, -0.9852, 0.1215])
+        # o3d.visualization.draw_geometries([pcd],
+        #                                     zoom=0.8,
+        #                                     front=[-0.4999, -0.1659, -0.8499],
+        #                                     lookat=[2.1813, 2.0619, 2.0999],
+        #                                     up=[0.1204, -0.9852, 0.1215])
         
         sorted_arr, rest_arr = sort_on_labels(pcd)
         if min_points > 10 and len(rest_arr) > 0:
@@ -157,9 +213,10 @@ class Test():
                 x1 = val_x if val_x < x1 else x1
                 x2 = val_x if val_x > x2 else x2
                 
+            if (len(x) == 0 or len(y) == 0):
+                continue
             x = np.array(x)
             y = np.array(y)
-
             a, b = np.polyfit(x,y,1)
             
             y1 = a*x1 + b
@@ -222,16 +279,7 @@ class Test():
                 connected_lines[-1].extend(best)
                 lines.pop(idx)
                 has_reversed = False
-                
-        res = []
-        for line in connected_lines:
-            if len(line) >= 3:
-                distance = distPoints(line[0], line[-1])
-                if distance <= distance_threshold:
-                    line.append(line[0])
-            res.append(line)
-        
-        return res
+        return connected_lines
             
     def rdp_angle(self, line, dist_threshold, angle_multiplier):   # Based on idea of rdp algorithm 
         def points_angle(A, B, C):
