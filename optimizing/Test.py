@@ -37,7 +37,7 @@ class Test():
             cluster,
             minValue=pcd.get_min_bound()[2],
             maxValue=pcd.get_max_bound()[2],
-            divider=0.2)
+            divider=0.1)
         
         clusterData = [[] for _ in range(len(heights))]
         for i in range(len(cluster)):
