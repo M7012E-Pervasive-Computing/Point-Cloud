@@ -44,9 +44,15 @@ class Test():
             plt.plot(x, y)
             simplified_lines.append(simplified_line)
         
-        v, e = self.getPlanes(0, 10, simplified_lines)
-        print(v)
-        print(e)
+        vertices, faces = self.getPlanes(0, 10, simplified_lines)
+        # print(v)
+        # print(e)
+    
+        with open("./test.obj", 'w') as file:
+            for v in vertices:
+                file.write(f"v {v[0]} {v[1]} {v[2]}\n")
+            for f in faces:
+                file.write(f"f {f[0]} {f[1]} {f[2]} {f[3]}\n")
     
         plt.show()
         
@@ -61,17 +67,14 @@ class Test():
                 face_vertices = [[x1, y1, max_z], [x2, y2, max_z], [x2, y2, min_z], [x1, y1, min_z]]
                 for v in face_vertices:
                     if v in vertices:
-                        face.append(vertices.index(v))
+                        face.append(vertices.index(v)+1)
                     else:
-                        face.append(len(vertices))
+                        face.append(len(vertices)+1)
                         vertices.append(v)
                 faces.append(face)
         return vertices, faces
                 
                 
-        
-                
-        
     def voxel_down(self, pcd, voxel_size):
         return pcd.voxel_down_sample(voxel_size=voxel_size)       
 
