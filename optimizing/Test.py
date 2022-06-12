@@ -45,11 +45,6 @@ class Test():
             simplified_lines.append(simplified_line)
         
         vertices, faces = self.getPlanes(0, 10, simplified_lines)
-        # with open("./test.obj", 'w') as file:
-        #     for v in vertices:
-        #         file.write(f"v {v[0]} {v[1]} {v[2]}\n")
-        #     for f in faces:
-        #         file.write(f"f {f[0]} {f[1]} {f[2]} {f[3]}\n")
         Store().storeRoom(vertices, faces)
         plt.show()
         
