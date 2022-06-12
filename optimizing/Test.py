@@ -33,10 +33,10 @@ class Test():
         clust = self.clustering(pcd=pcd2, eps=0.8, min_points=75)
         
         lines = self.getLines(clust) 
-        line = self.connectLines(lines, distance_threshold=3) 
+        line = self.connectLines(lines, distance_threshold=1.5) 
         for l in line:
             if len(l) >= 3:
-                simplified_line = self.rdp_angle(l, dist_threshold=1, angle_divider=1.2)
+                simplified_line = self.rdp_angle(l, dist_threshold=1, angle_multiplier=1.25)
             else: 
                 simplified_line = l
             x = [x for x, _ in simplified_line]
@@ -192,14 +192,13 @@ class Test():
                         best = [p2,p1]
                         idx = i 
             if best is None: 
-                print("new Line")
                 connected_lines.append(lines.pop(0))
             else: 
                 connected_lines[-1].extend(best)
                 lines.pop(idx)
         return connected_lines
             
-    def rdp_angle(self, line, dist_threshold, angle_divider):   # Based on idea of rdp algorithm 
+    def rdp_angle(self, line, dist_threshold, angle_multiplier):   # Based on idea of rdp algorithm 
         def points_angle(A, B, C):
             Ax, Ay = A[0]-B[0], A[1]-B[1]
             Cx, Cy = C[0]-B[0], C[1]-B[1]
@@ -224,9 +223,8 @@ class Test():
                 
                 angle = points_angle(A, B, C)
                 dist = point_line_distance(A, B, C)      
-                dist = (dist / angle_divider) if angle < 70 else dist   # Done since this algorithm will generally struggle with smaller angles
-                dist = (dist / angle_divider) if angle < 50 else dist   # To make simplification more accurate
-                dist = (dist / angle_divider) if angle < 30 else dist
+                dist = (dist * angle_multiplier) if angle >= 60 else dist
+    
             
                 if dist < dist_threshold: 
                     diff = dist_threshold - dist
