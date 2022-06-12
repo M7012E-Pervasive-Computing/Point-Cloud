@@ -33,40 +33,39 @@ class Test():
                 
         cluster = self.clustering(pcd=pcd2, eps=0.8, min_points=75)
         
-        cluster = self.setClusterForHeight(
+        cluster, heights = self.setClusterForHeight(
             cluster,
             minValue=pcd.get_min_bound()[2],
             maxValue=pcd.get_max_bound()[2],
             divider=0.2)
         
-        # lines = self.getLines(clust) 
-        # line = self.connectLines(lines, distance_threshold=2) 
-        # simplified_lines = []
-        # for l in line:
-        #     simplified_line = self.rdp_angle(l, dist_threshold=1.5, angle_multiplier=1.25)
-        #     x = [x for x, _ in simplified_line]
-        #     y = [y for _, y in simplified_line]
-        #     x.append(x[0])
-        #     y.append(y[0])
-        #     plt.plot(x, y)
-        #     simplified_lines.append(simplified_line)
-        
-        clusterData = [[] for _ in range(len(cluster))]
+        clusterData = [[] for _ in range(len(heights))]
         for i in range(len(cluster)):
             for j in range(len(cluster[i])):
-                clusterData[i].append(cluster[i][j])
+                clusterData[j].append(cluster[i][j])
         
         allLines = []
         simplified_lines = []
+        adding_index = 0
+        vertices = []
+        edges = []
+        print(heights)
         for i in range(len(clusterData)):
-            if len(clusterData[i]) == 0:
-                continue
+            # print(clusterData[i])
             lines = self.getLines(np.asarray(clusterData[i]))
             lines = self.connectLines(lines, distance_threshold=2) 
             allLines.append(lines)
             for l in lines:
                 simplified_line = self.rdp_angle(l, dist_threshold=1.5, angle_multiplier=1.25)
                 simplified_lines.append(simplified_line)
+            v, e = self.getPlanes(heights[i][0], heights[i][1], simplified_lines, adding_index=adding_index)
+            vertices.extend(v)
+            edges.extend(e)
+            adding_index += len(v)
+        # print(vertices)
+        # print(edges)
+        print(len(vertices))
+        print(len(edges))
         # lines = self.getLines(cluster) 
         # for l in lines:
         #     simplified_line = self.rdp_angle(l, dist_threshold=1.5, angle_multiplier=1.25)
@@ -77,34 +76,40 @@ class Test():
         #     plt.plot(x, y)
         #     simplified_lines.append(simplified_line)
         
-        v, e = self.getPlanes(pcd.get_min_bound()[2], pcd.get_max_bound()[2], simplified_lines)
-        print(v)
-        print(e)
+        # v, e = self.getPlanes(pcd.get_min_bound()[2], pcd.get_max_bound()[2], simplified_lines)
+        # print(v)
+        # print(e)
         
-        Store().storeRoom(v, e)
+        Store().storeRoom(vertices, edges)
     
         plt.show()
     
     def setClusterForHeight(self, clusters, minValue, maxValue, divider=0.2):
         returnCluster = []
-        # print(clusters)
+        heights = []
+        first = True
+        print(minValue, maxValue)
+        jump = (maxValue - minValue) * divider
+        numberOfJumps = int((maxValue - minValue) / jump)
+        print(f'number of jumps: {numberOfJumps}')
         for cluster in clusters:
             newCluster = []
             cluster = np.asarray(cluster)
-            jump = (maxValue - minValue) * divider
-            numberOfJumps = int((maxValue - minValue) / jump)
             for i in range(numberOfJumps):
+                if first:
+                    heights.append([minValue + jump * i, maxValue - jump * (numberOfJumps - i - 1)])
                 newCluster2 = []
                 for val in cluster:
                     if (val[2] > minValue + jump * i) and (val[2] < maxValue - jump * (numberOfJumps - i - 1)):
                         newCluster2.append(val)
                 newCluster.append(newCluster2)
+            first = False
             returnCluster.append(newCluster)
             # print(newCluster)
-        return returnCluster
+        return returnCluster, heights
             
     
-    def getPlanes(self, min_z, max_z, lines):
+    def getPlanes(self, min_z, max_z, lines, adding_index=0):
         vertices = []
         faces = []
         for line in lines:
@@ -115,9 +120,9 @@ class Test():
                 face_vertices = [[x1, y1, max_z], [x2, y2, max_z], [x2, y2, min_z], [x1, y1, min_z]]
                 for v in face_vertices:
                     if v in vertices:
-                        face.append(vertices.index(v)+1)
+                        face.append(adding_index + vertices.index(v)+1)
                     else:
-                        face.append(len(vertices)+1)
+                        face.append(adding_index + len(vertices)+1)
                         vertices.append(v)
                 faces.append(face)
         return vertices, faces
@@ -207,7 +212,10 @@ class Test():
             x, y = [], []
             x1 = np.inf
             x2 = -np.inf
-            for val_x, val_y, _ in cluster:
+            for i in range(len(cluster)):
+                if cluster[i] == []:
+                    continue
+                val_x, val_y, _ = cluster[i]
                 x.append(val_x)
                 y.append(val_y)
                 x1 = val_x if val_x < x1 else x1
