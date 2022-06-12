@@ -33,12 +33,15 @@ class Test():
         clust = self.clustering(pcd=pcd2, eps=0.8, min_points=75)
         
         lines = self.getLines(clust) 
-        line = self.connectLines(lines) 
-        simplified_line = self.rdp_angle(line, dist_threshold=1, angle_divider=2)
-        
-        x = [x for x, _ in simplified_line]
-        y = [y for _, y in simplified_line]
-        plt.plot(x,y)
+        line = self.connectLines(lines, distance_threshold=3) 
+        for l in line:
+            if len(l) >= 3:
+                simplified_line = self.rdp_angle(l, dist_threshold=1, angle_divider=1.2)
+            else: 
+                simplified_line = l
+            x = [x for x, _ in simplified_line]
+            y = [y for _, y in simplified_line]
+            plt.plot(x, y)
         plt.show()
                 
         
@@ -146,7 +149,7 @@ class Test():
         # plt.show()
         return lines
     
-    def connectLines(self, lines):  #? Add distance threshold parameter
+    def connectLines(self, lines, distance_threshold): 
         def distPoints(p1, p2):
             x1, y1 = p1
             x2, y2 = p2
@@ -165,18 +168,19 @@ class Test():
                         best = idx
                 sorted_lines.append(lines.pop(best))
             return sorted_lines
-                
+        
         lines = sortLongest(lines)  
-        points = lines[0]   #? List of points which connect into one line 
-        lines.pop(0)
+        connected_lines = [lines.pop(0)]
         while len(lines) > 0: 
-            p = points[-1]
+            point = connected_lines[-1][-1]
             bestDist = np.inf
             best = None
             idx = None 
             for i, [p1, p2] in enumerate(lines):    
-                dist1 = distPoints(p, p1)   #? Check if the distances are larger then distance threshold
-                dist2 = distPoints(p, p2)   #? ^
+                dist1 = distPoints(point, p1)  
+                dist2 = distPoints(point, p2) 
+                dist1 = np.inf if dist1 > distance_threshold else dist1
+                dist2 = np.inf if dist2 > distance_threshold else dist2  
                 if dist1 < dist2: 
                     if dist1 < bestDist:
                         bestDist = dist1
@@ -188,12 +192,12 @@ class Test():
                         best = [p2,p1]
                         idx = i 
             if best is None: 
-                continue    #? instead of having the current list "points" have a list where one index would be the current "points".
-                            #? Then instead of continue we append to that new list.
+                print("new Line")
+                connected_lines.append(lines.pop(0))
             else: 
-                points.extend(best)
+                connected_lines[-1].extend(best)
                 lines.pop(idx)
-        return points
+        return connected_lines
             
     def rdp_angle(self, line, dist_threshold, angle_divider):   # Based on idea of rdp algorithm 
         def points_angle(A, B, C):
@@ -209,18 +213,17 @@ class Test():
         def point_line_distance(A, B, C):
             return npl.norm(np.cross(C-A, A-B))/npl.norm(C-A)
         
-        while True:
-            length = len(line) - 1
-            
+        length = len(line)
+        while length >= 3:
             largestDiff = -np.inf
             idx = None
             for i in range(1, length):
                 A = np.array(line[(i-1) % length])
                 B = np.array(line[i])
-                C = np.array(line[(i+2) % length])
+                C = np.array(line[(i+1) % length])
                 
                 angle = points_angle(A, B, C)
-                dist = point_line_distance(A, B, C)            
+                dist = point_line_distance(A, B, C)      
                 dist = (dist / angle_divider) if angle < 70 else dist   # Done since this algorithm will generally struggle with smaller angles
                 dist = (dist / angle_divider) if angle < 50 else dist   # To make simplification more accurate
                 dist = (dist / angle_divider) if angle < 30 else dist
@@ -232,7 +235,8 @@ class Test():
                         idx = i
                         
             if idx is None: 
-                if len(line) > 0: 
-                    line.append(line[0])
                 return line
-            line.pop(idx)
+            else:
+                line.pop(idx)
+                length -= 1
+        return line 
