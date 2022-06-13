@@ -31,100 +31,61 @@ class Test():
         vox = self.voxel_down(pcd=pcd, voxel_size=0.5)
         pcd2 = self.denoise(pcd=vox, ratio=0.05, neighbors=25)
                 
-        cluster = self.clustering(pcd=pcd2, eps=0.8, min_points=75)
+        clusters = self.clustering(pcd=pcd2, eps=0.8, min_points=75)
         
-        cluster, heights = self.setClusterForHeight(
-            cluster,
-            minValue=pcd.get_min_bound()[2],
-            maxValue=pcd.get_max_bound()[2],
-            divider=0.1)
+        heights = self.cluster_heights(minValue=pcd.get_min_bound()[2], maxValue=pcd.get_max_bound()[2], divider=0.1)
+        clusterData = self.sort_clusters_for_height(clusters=clusters, heights=heights)
         
-        clusterData = [[] for _ in range(len(heights))]
-        for i in range(len(cluster)):
-            for j in range(len(cluster[i])):
-                clusterData[j].append(cluster[i][j])
-        
-        allLines = []
-        simplified_lines = []
-        adding_index = 0
-        vertices = []
-        edges = []
-        print(heights)
-        for i in range(len(clusterData)):
-            # print(clusterData[i])
-            lines = self.getLines(np.asarray(clusterData[i]))
-            lines = self.connectLines(lines, distance_threshold=2) 
-            allLines.append(lines)
-            for l in lines:
-                simplified_line = self.rdp_angle(l, dist_threshold=1.5, angle_multiplier=1.25)
+        height_lines = []
+        for height_clusters in clusterData:
+            lines = self.getLines(np.asarray(height_clusters))
+            lines = self.connectLines(lines, distance_threshold=2)
+            simplified_lines = [[]]
+            for line in lines:
+                simplified_line = self.rdp_angle(line, dist_threshold=1.5, angle_multiplier=1.25)
                 simplified_lines.append(simplified_line)
-            v, e = self.getPlanes(heights[i][0], heights[i][1], simplified_lines, adding_index=adding_index)
-            vertices.extend(v)
-            edges.extend(e)
-            adding_index += len(v)
-        # print(vertices)
-        # print(edges)
-        print(len(vertices))
-        print(len(edges))
-        # lines = self.getLines(cluster) 
-        # for l in lines:
-        #     simplified_line = self.rdp_angle(l, dist_threshold=1.5, angle_multiplier=1.25)
-        #     x = [x for x, _ in simplified_line]
-        #     y = [y for _, y in simplified_line]
-        #     x.append(x[0])
-        #     y.append(y[0])
-        #     plt.plot(x, y)
-        #     simplified_lines.append(simplified_line)
+            height_lines.append(simplified_lines)
+            # plt.show()
+        vertices, faces = self.lines_to_faces(heights=heights, height_lines=height_lines)
         
-        # v, e = self.getPlanes(pcd.get_min_bound()[2], pcd.get_max_bound()[2], simplified_lines)
-        # print(v)
-        # print(e)
+        Store().storeRoom(vertices, faces) 
         
-        Store().storeRoom(vertices, edges)
-    
-        plt.show()
-    
-    def setClusterForHeight(self, clusters, minValue, maxValue, divider=0.2):
-        returnCluster = []
-        heights = []
-        first = True
-        print(minValue, maxValue)
+    def cluster_heights(self, minValue, maxValue, divider):
         jump = (maxValue - minValue) * divider
-        numberOfJumps = int((maxValue - minValue) / jump)
-        print(f'number of jumps: {numberOfJumps}')
-        for cluster in clusters:
-            newCluster = []
-            cluster = np.asarray(cluster)
-            for i in range(numberOfJumps):
-                if first:
-                    heights.append([minValue + jump * i, maxValue - jump * (numberOfJumps - i - 1)])
-                newCluster2 = []
-                for val in cluster:
-                    if (val[2] > minValue + jump * i) and (val[2] < maxValue - jump * (numberOfJumps - i - 1)):
-                        newCluster2.append(val)
-                newCluster.append(newCluster2)
-            first = False
-            returnCluster.append(newCluster)
-            # print(newCluster)
-        return returnCluster, heights
-            
+        numberOfJumps = int(np.ceil((maxValue - minValue) / jump))
+        return [[minValue + jump * i, maxValue - jump * (numberOfJumps - i - 1)] for i in range(numberOfJumps)]
     
-    def getPlanes(self, min_z, max_z, lines, adding_index=0):
+    def sort_clusters_for_height(self, clusters, heights):
+        sorted_clusters = []
+        for height in heights:
+            print(height)
+            height_clusters = []
+            for cluster in clusters:
+                height_cluster = []
+                for vertex in cluster:
+                    if vertex[2] >= height[0] and vertex[2] <= height[1]:
+                        height_cluster.append(vertex)
+                height_clusters.append(height_cluster)
+            sorted_clusters.append(height_clusters)
+        return sorted_clusters
+    
+    def lines_to_faces(self, heights, height_lines):
         vertices = []
         faces = []
-        for line in lines:
-            for i in range(1, len(line)):
-                x1, y1 = line[i-1]
-                x2, y2 = line[i]
-                face = []
-                face_vertices = [[x1, y1, max_z], [x2, y2, max_z], [x2, y2, min_z], [x1, y1, min_z]]
-                for v in face_vertices:
-                    if v in vertices:
-                        face.append(adding_index + vertices.index(v)+1)
-                    else:
-                        face.append(adding_index + len(vertices)+1)
-                        vertices.append(v)
-                faces.append(face)
+        for i, lines in enumerate(height_lines):
+            for line in lines:
+                for i in range(1, len(line)):
+                    x1, y1 = line[i-1]
+                    x2, y2 = line[i]
+                    face = []
+                    face_vertices = [[x1, y1, heights[i][1]], [x2, y2, heights[i][1]], [x2, y2, heights[i][0]], [x1, y1, heights[i][0]]]
+                    for v in face_vertices:
+                        if v in vertices:
+                            face.append(vertices.index(v)+1)
+                        else:
+                            face.append(len(vertices)+1)
+                            vertices.append(v)
+                    faces.append(face)
         return vertices, faces
                 
                 
@@ -140,7 +101,7 @@ class Test():
         inliers.paint_uniform_color([0, 0, 1])
         outlier = pcd.select_by_index(index, invert=True)
         outlier.paint_uniform_color([1, 0, 0])
-        # o3d.visualization.draw_geometries([inliers, outlier])
+        o3d.visualization.draw_geometries([inliers, outlier])
         
         inliers.paint_uniform_color([0, 0, 0])
         return inliers
@@ -192,11 +153,11 @@ class Test():
         colors[labels < 0] = 0
         pcd.colors = o3d.utility.Vector3dVector(colors[:, :3])
         
-        # o3d.visualization.draw_geometries([pcd],
-        #                                     zoom=0.8,
-        #                                     front=[-0.4999, -0.1659, -0.8499],
-        #                                     lookat=[2.1813, 2.0619, 2.0999],
-        #                                     up=[0.1204, -0.9852, 0.1215])
+        o3d.visualization.draw_geometries([pcd],
+                                            zoom=0.8,
+                                            front=[-0.4999, -0.1659, -0.8499],
+                                            lookat=[2.1813, 2.0619, 2.0999],
+                                            up=[0.1204, -0.9852, 0.1215])
         
         sorted_arr, rest_arr = sort_on_labels(pcd)
         if min_points > 10 and len(rest_arr) > 0:
@@ -230,7 +191,7 @@ class Test():
             y1 = a*x1 + b
             y2 = a*x2 + b
             
-            plt.plot(x, y, 'o')
+            # plt.plot(x, y, 'o')
             # plt.plot(x, (a*x + b))
             lines.append([[x1, y1], [x2, y2]])
         # plt.show()
