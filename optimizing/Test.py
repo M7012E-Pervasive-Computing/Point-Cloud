@@ -17,6 +17,7 @@ class Test():
         self.pcd = o3d.geometry.PointCloud()
         self.pcd.points = o3d.utility.Vector3dVector(points)
         self.pcd.paint_uniform_color([0, 0, 0])
+        o3d.visualization.draw_geometries([self.pcd])
         
         self.test3()
 
@@ -34,18 +35,23 @@ class Test():
         clusters = self.clustering(pcd=pcd2, eps=0.8, min_points=75)
         
         heights = self.cluster_heights(minValue=pcd.get_min_bound()[2], maxValue=pcd.get_max_bound()[2], divider=0.1)
-        clusterData = self.sort_clusters_for_height(clusters=clusters, heights=heights)
+        # heights = [[pcd.get_min_bound()[2], pcd.get_max_bound()[2]]]
+        height_clusters = self.sort_clusters_for_height(clusters=clusters, heights=heights)
+        # heights = [[pcd.get_min_bound()[2], pcd.get_max_bound()[2]] for _ in heights]
         
         height_lines = []
-        for height_clusters in clusterData:
-            lines = self.getLines(np.asarray(height_clusters))
+        for height_cluster in height_clusters:
+            lines = self.getLines(height_cluster)
             lines = self.connectLines(lines, distance_threshold=2)
             simplified_lines = [[]]
             for line in lines:
                 simplified_line = self.rdp_angle(line, dist_threshold=1.5, angle_multiplier=1.25)
                 simplified_lines.append(simplified_line)
+                x = [x for x, _ in simplified_line]
+                y = [y for _, y in simplified_line]
+                plt.plot(x,y)
             height_lines.append(simplified_lines)
-            # plt.show()
+            plt.show()
         vertices, faces = self.lines_to_faces(heights=heights, height_lines=height_lines)
         
         Store().storeRoom(vertices, faces) 
@@ -58,7 +64,6 @@ class Test():
     def sort_clusters_for_height(self, clusters, heights):
         sorted_clusters = []
         for height in heights:
-            print(height)
             height_clusters = []
             for cluster in clusters:
                 height_cluster = []
@@ -72,13 +77,17 @@ class Test():
     def lines_to_faces(self, heights, height_lines):
         vertices = []
         faces = []
-        for i, lines in enumerate(height_lines):
+        for height_idx, lines in enumerate(height_lines, start=0):
             for line in lines:
-                for i in range(1, len(line)):
-                    x1, y1 = line[i-1]
-                    x2, y2 = line[i]
+                for line_idx in range(1, len(line)):
+                    x1, y1 = line[line_idx-1]
+                    x2, y2 = line[line_idx]
                     face = []
-                    face_vertices = [[x1, y1, heights[i][1]], [x2, y2, heights[i][1]], [x2, y2, heights[i][0]], [x1, y1, heights[i][0]]]
+                    face_vertices = [
+                        [x1, y1, heights[height_idx][1]], 
+                        [x2, y2, heights[height_idx][1]], 
+                        [x2, y2, heights[height_idx][0]], 
+                        [x1, y1, heights[height_idx][0]]]
                     for v in face_vertices:
                         if v in vertices:
                             face.append(vertices.index(v)+1)
@@ -191,7 +200,7 @@ class Test():
             y1 = a*x1 + b
             y2 = a*x2 + b
             
-            # plt.plot(x, y, 'o')
+            plt.plot(x, y, 'o')
             # plt.plot(x, (a*x + b))
             lines.append([[x1, y1], [x2, y2]])
         # plt.show()
