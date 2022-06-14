@@ -6,11 +6,8 @@ import matplotlib.pyplot as plt
 class Cluster():
     
     @staticmethod
-    def clustering(point_cloud, eps, min_points):
-        with o3d.utility.VerbosityContextManager(
-            o3d.utility.VerbosityLevel.Debug) as cm:
-            labels = np.array(
-                point_cloud.cluster_dbscan(eps=eps, min_points=min_points, print_progress=False))
+    def clustering(point_cloud, eps, min_points, debug=False):
+        labels = np.array(point_cloud.cluster_dbscan(eps=eps, min_points=min_points, print_progress=False))
 
         max_label = np.max(labels)
         # print(f"point cloud has {max_label + 1} clusters")
@@ -19,11 +16,8 @@ class Cluster():
         colors[labels < 0] = 0
         point_cloud.colors = o3d.utility.Vector3dVector(colors[:, :3])
         
-        o3d.visualization.draw_geometries([point_cloud],
-                                            zoom=0.8,
-                                            front=[-0.4999, -0.1659, -0.8499],
-                                            lookat=[2.1813, 2.0619, 2.0999],
-                                            up=[0.1204, -0.9852, 0.1215])
+        if debug:
+            o3d.visualization.draw_geometries([point_cloud])
         
         sorted_arr, rest_arr = Cluster._sort_on_labels(point_cloud)
         if min_points > 10 and len(rest_arr) > 0:
