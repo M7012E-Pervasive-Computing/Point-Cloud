@@ -3,10 +3,10 @@ import numpy as np
 import open3d as o3d
 import matplotlib.pyplot as plt
 
-class Clustering():
+class Cluster():
     
     @staticmethod
-    def cluster(point_cloud, eps, min_points):
+    def clustering(point_cloud, eps, min_points):
         with o3d.utility.VerbosityContextManager(
             o3d.utility.VerbosityLevel.Debug) as cm:
             labels = np.array(
@@ -25,11 +25,11 @@ class Clustering():
                                             lookat=[2.1813, 2.0619, 2.0999],
                                             up=[0.1204, -0.9852, 0.1215])
         
-        sorted_arr, rest_arr = Clustering._sort_on_labels(point_cloud)
+        sorted_arr, rest_arr = Cluster._sort_on_labels(point_cloud)
         if min_points > 10 and len(rest_arr) > 0:
             point_cloud = o3d.geometry.PointCloud()
             point_cloud.points = o3d.utility.Vector3dVector(rest_arr) 
-            sorted_rest = Clustering.cluster(point_cloud, eps, int(round(min_points/2)))
+            sorted_rest = Cluster.clustering(point_cloud, eps, int(round(min_points/2)))
             sorted_arr.extend(sorted_rest)
         return sorted_arr
     
@@ -41,14 +41,14 @@ class Clustering():
         clusters = []
         unclustered = []
         for color in pcd_colors:
-            if (not Clustering._is_in(color, all_colors)):
+            if (not Cluster._is_in(color, all_colors)):
                 all_colors.append(color)
         for color in all_colors:
             temp_arr = []
             for index in range(len(pcd_colors)):
                 if ((color == pcd_colors[index]).all()):
                     temp_arr.append(pcd_arr[index])
-            if (Clustering._is_black(color)):
+            if (Cluster._is_black(color)):
                 unclustered.extend(temp_arr)
             else:
                 clusters.append(temp_arr)

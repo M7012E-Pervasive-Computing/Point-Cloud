@@ -8,7 +8,7 @@ from Helper.Input import Input
 
 from PostProcessing.PointCloud.DenoiseOutlier import DenoiseOutlier as Denoise
 from PostProcessing.PointCloud.Downsampling import Downsampling
-from PostProcessing.PointCloud.Clustering import Clustering
+from PostProcessing.PointCloud.Cluster import Cluster
 from PostProcessing.PointCloud.SliceByHeight import SliceByHeight
 from PostProcessing.PointCloud.CreateLines import CreateLines
 
@@ -59,11 +59,47 @@ class ProcessByInput():
             col=int(np.ceil(length/2)))
         index = Input.get_int_input(length, "Pick a cloud:\n")
         return denoised_clouds[index]
-        
     
     @staticmethod
-    def _plot_point_clouds(point_clouds: list, row: int, col: int) -> None:
-        color_map = plt.cm.get_cmap('RdYlBu')
+    def _cluster(point_cloud: o3d.geometry.PointCloud) -> list:
+        arguments = [
+            {"eps" : 1, "min_points" : 75},
+            {"eps" : 0.8, "min_points": 75},
+            {"eps" : 0.7, "min_points": 75},
+            {"eps" : 0.6, "min_points": 75},
+            {"eps" : 0.4, "min_points": 75},
+            {"eps" : 0.2, "min_points": 75}
+        ]
+        clustered_points = []
+        for arg in arguments:
+            cloud = copy.deepcopy(point_cloud)
+            cluster = Cluster.clustering(
+                point_cloud=cloud,
+                eps=arg["eps"], 
+                min_points=arg["min_points"])
+            clustered_points.append(cluster)
+        length = len(clustered_points)
+        
+        point_clouds = []
+        colors = []
+        for clusters in clustered_points:
+            points = []
+            color = []
+            for i, cluster in enumerate(clusters):
+                points.extend(cluster)
+                color.extend([i for _ in range(len(cluster))])
+            point_clouds.append(ProcessByInput._createPointCloud(points=points))
+            colors.append(color)
+        ProcessByInput._plot_point_clouds(
+            point_clouds=point_clouds, 
+            row=2,
+            col=int(np.ceil(length/2)), 
+            colors=colors)
+        index = Input.get_int_input(length, "Pick a cloud:\n")
+        return clustered_points[index]
+    
+    @staticmethod
+    def _plot_point_clouds(point_clouds: list, row: int, col: int, colors=None) -> None:
         figure = plt.figure(figsize=plt.figaspect(0.5))
         for r in range(row): 
             for c in range(col):
@@ -75,7 +111,7 @@ class ProcessByInput():
                 x = [i for i, _, _ in points]
                 y = [i for _, i, _ in points]
                 z = [i for _, _, i in points]
-                ax.scatter(x, y, z, c=z)
+                ax.scatter(x, y, z, c=(z if colors is None else colors[index]))
                 ax.view_init(azim=0, elev=90)
         plt.show()
     
