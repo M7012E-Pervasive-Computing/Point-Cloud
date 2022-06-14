@@ -14,7 +14,7 @@ class App():
         session_name = App._select_session(session_names=session_names)
         points = Import.points(session_name=session_name)
         pcd = ProcessByInput._createPointCloud(points)
-        ProcessByInput.denoise(pcd)
+        ProcessByInput._denoise(pcd)
         
         
     @staticmethod

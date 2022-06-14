@@ -11,7 +11,7 @@ class DenoiseOutlier():
         inliers.paint_uniform_color([0, 0, 1])
         outlier = point_cloud.select_by_index(index, invert=True)
         outlier.paint_uniform_color([1, 0, 0])
-        o3d.visualization.draw_geometries([inliers, outlier])
+        # o3d.visualization.draw_geometries([inliers, outlier])
         
         inliers.paint_uniform_color([0, 0, 0])
         return inliers
@@ -24,7 +24,7 @@ class DenoiseOutlier():
         inliers.paint_uniform_color([0, 0, 1])
         outlier = point_cloud.select_by_index(index, invert=True)
         outlier.paint_uniform_color([1, 0, 0])
-        o3d.visualization.draw_geometries([inliers, outlier])
+        # o3d.visualization.draw_geometries([inliers, outlier])
         
         inliers.paint_uniform_color([0, 0, 0])
         return inliers

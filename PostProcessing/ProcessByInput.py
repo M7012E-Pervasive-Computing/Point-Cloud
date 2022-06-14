@@ -28,74 +28,55 @@ class ProcessByInput():
         return point_cloud  
     
     @staticmethod
-    def denoise(point_cloud: o3d.geometry.PointCloud) -> o3d.geometry.PointCloud:
+    def _denoise(point_cloud: o3d.geometry.PointCloud) -> o3d.geometry.PointCloud:
         arguments = [
-            {
-                "ratio" : [0.05, 0.05],
-                "neighbors" : [75, 25],
-                "voxel_size" : 0.5,
-            },
-            {
-                "ratio" : [0.05, 0.05],
-                "neighbors" : [75, 25],
-                "voxel_size" : 0.5,
-            },
-            {
-                "ratio" : [0.05, 0.05],
-                "neighbors" : [75, 25],
-                "voxel_size" : 0.5,
-            },
-            {
-                "ratio" : [0.05, 0.05],
-                "neighbors" : [75, 25],
-                "voxel_size" : 0.5,
-            },
-            {
-                "ratio" : [0.05, 0.05],
-                "neighbors" : [75, 25],
-                "voxel_size" : 0.5,
-            },
-            {
-                "ratio" : [0.05, 0.05],
-                "neighbors" : [75, 25],
-                "voxel_size" : 0.5,
-            }
+            {"ratio" : [0.05, 0.05],    "neighbors" : [150, 50],    "voxel_size" : 0.5},
+            {"ratio" : [0.05, 0.05],    "neighbors" : [75, 25],     "voxel_size" : 0.5},
+            {"ratio" : [0.05, 0.05],    "neighbors" : [50, 20],     "voxel_size" : 0.5},
+            {"ratio" : [0.05, 0.05],    "neighbors" : [40, 15],     "voxel_size" : 0.5},
+            {"ratio" : [0.05, 0.05],    "neighbors" : [100, 50],    "voxel_size" : 0.2},
+            {"ratio" : [0.05, 0.05],    "neighbors" : [100, 50],    "voxel_size" : 0.1}
         ]
         denoised_clouds = []
-        for i in range(len(arguments)):
+        for arg in arguments:
             cloud = copy.deepcopy(point_cloud)
             cloud = Denoise.statistical_outlier(
                 point_cloud=cloud, 
-                ratio=arguments[i]["ratio"][0], 
-                neighbors=arguments[i]["neighbors"][0])
+                ratio=arg["ratio"][0],
+                neighbors=arg["neighbors"][0])
             cloud = Downsampling.voxel_down(
                 point_cloud=cloud,
-                voxel_size=arguments[i]["voxel_size"])
+                voxel_size=arg["voxel_size"])
             cloud = Denoise.statistical_outlier(
                 point_cloud=cloud,
-                ratio=arguments[i]["ratio"][1], 
-                neighbors=arguments[i]["neighbors"][1])
+                ratio=arg["ratio"][1],
+                neighbors=arg["neighbors"][1])
             denoised_clouds.append(cloud)
         length = len(denoised_clouds)
         ProcessByInput._plot_point_clouds(
             point_clouds=denoised_clouds, 
-            row=int(np.floor(length/2)),
+            row=2,
             col=int(np.ceil(length/2)))
-        Input.get_int_input(length, "Pick a cloud:\n")
+        index = Input.get_int_input(length, "Pick a cloud:\n")
+        return denoised_clouds[index]
+        
     
     @staticmethod
     def _plot_point_clouds(point_clouds: list, row: int, col: int) -> None:
+        color_map = plt.cm.get_cmap('RdYlBu')
         figure = plt.figure(figsize=plt.figaspect(0.5))
         for r in range(row): 
             for c in range(col):
-                ax = figure.add_subplot(row, col, (r, c), projection='3d')
-                ax.set_title(f"{r*col+c}")
-                point_cloud = point_clouds[r*col+c]
+                index = r*col+c
+                ax = figure.add_subplot(row, col, index+1, projection='3d')
+                ax.set_title(f"{index}")
+                point_cloud = point_clouds[index]
                 points = np.asarray(point_cloud.points)
                 x = [i for i, _, _ in points]
                 y = [i for _, i, _ in points]
                 z = [i for _, _, i in points]
-                ax.plot(x, y, z)
+                ax.scatter(x, y, z, c=z)
+                ax.view_init(azim=0, elev=90)
         plt.show()
     
     
