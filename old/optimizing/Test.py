@@ -200,7 +200,7 @@ class Test():
             y1 = a*x1 + b
             y2 = a*x2 + b
             
-            plt.plot(x, y, 'o')
+            # plt.plot(x, y, 'o')
             # plt.plot(x, (a*x + b))
             lines.append([[x1, y1], [x2, y2]])
         # plt.show()
