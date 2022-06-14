@@ -2,6 +2,8 @@
 from Import.ImportSession import ImportSession as Import
 from Export.ExportObj import ExportObj as Export
 
+from PostProcessing.ProcessByInput import ProcessByInput
+
 from Helper.Input import Input
 
 class App():
@@ -11,6 +13,9 @@ class App():
         session_names = Import.names()
         session_name = App._select_session(session_names=session_names)
         points = Import.points(session_name=session_name)
+        pcd = ProcessByInput._createPointCloud(points)
+        ProcessByInput.denoise(pcd)
+        
         
     @staticmethod
     def _select_session(session_names: list) -> str:

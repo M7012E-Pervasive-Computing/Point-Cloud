@@ -34,10 +34,35 @@ class ProcessByInput():
                 "ratio" : [0.05, 0.05],
                 "neighbors" : [75, 25],
                 "voxel_size" : 0.5,
+            },
+            {
+                "ratio" : [0.05, 0.05],
+                "neighbors" : [75, 25],
+                "voxel_size" : 0.5,
+            },
+            {
+                "ratio" : [0.05, 0.05],
+                "neighbors" : [75, 25],
+                "voxel_size" : 0.5,
+            },
+            {
+                "ratio" : [0.05, 0.05],
+                "neighbors" : [75, 25],
+                "voxel_size" : 0.5,
+            },
+            {
+                "ratio" : [0.05, 0.05],
+                "neighbors" : [75, 25],
+                "voxel_size" : 0.5,
+            },
+            {
+                "ratio" : [0.05, 0.05],
+                "neighbors" : [75, 25],
+                "voxel_size" : 0.5,
             }
         ]
         denoised_clouds = []
-        for i in range(arguments):
+        for i in range(len(arguments)):
             cloud = copy.deepcopy(point_cloud)
             cloud = Denoise.statistical_outlier(
                 point_cloud=cloud, 
