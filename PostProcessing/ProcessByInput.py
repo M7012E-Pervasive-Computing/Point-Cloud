@@ -20,7 +20,17 @@ from PostProcessing.Line.CreateFaces import CreateFaces
 class ProcessByInput():
     
     @staticmethod
-    def _createPointCloud(points: list, debug=False) -> o3d.geometry.PointCloud:
+    def apply_post_input_processing(points: list) -> tuple:
+        point_cloud = ProcessByInput.__createPointCloud(points=points)
+        point_cloud = ProcessByInput.__denoise(point_cloud=point_cloud)
+        clustered_points = ProcessByInput.__cluster(point_cloud=point_cloud)
+        min = point_cloud.get_min_bound()[2]
+        max = point_cloud.get_max_bound()[2]
+        heights, height_slices = ProcessByInput.__height(minValue=min, maxValue=max, point_clouds_points=clustered_points)
+        return ProcessByInput.__point_cloud_to_lines(heights=heights, height_slices=height_slices)
+    
+    @staticmethod
+    def __createPointCloud(points: list, debug=False) -> o3d.geometry.PointCloud:
         point_cloud = o3d.geometry.PointCloud()
         point_cloud.points = o3d.utility.Vector3dVector(points)
         point_cloud.paint_uniform_color([0, 0, 0])
@@ -29,7 +39,7 @@ class ProcessByInput():
         return point_cloud  
     
     @staticmethod
-    def _denoise(point_cloud: o3d.geometry.PointCloud) -> o3d.geometry.PointCloud:
+    def __denoise(point_cloud: o3d.geometry.PointCloud) -> o3d.geometry.PointCloud:
         arguments = [
             {"ratio" : [0.05, 0.05],    "neighbors" : [150, 50],    "voxel_size" : 0.5},
             {"ratio" : [0.05, 0.05],    "neighbors" : [75, 25],     "voxel_size" : 0.5},
@@ -54,15 +64,15 @@ class ProcessByInput():
                 neighbors=arg["neighbors"][1])
             denoised_clouds.append(cloud)
         length = len(denoised_clouds)
-        ProcessByInput._plot_point_clouds(
+        ProcessByInput.__plot_point_clouds(
             point_clouds=denoised_clouds, 
             row=2,
             col=int(np.ceil(length/2)))
-        index = Input.get_int_input(max=length, print_str="Pick a cloud:\n")
+        index = Input.get_int_input(max=length, print_str="Pick denoised cloud:\n> ")
         return denoised_clouds[index]
     
     @staticmethod
-    def _cluster(point_cloud: o3d.geometry.PointCloud) -> list:
+    def __cluster(point_cloud: o3d.geometry.PointCloud) -> list:
         arguments = [
             {"eps" : 1,     "min_points" : 75},
             {"eps" : 0.8,   "min_points" : 75},
@@ -89,21 +99,21 @@ class ProcessByInput():
             for i, cluster in enumerate(clusters):
                 points.extend(cluster)
                 color.extend([i for _ in range(len(cluster))])
-            point_clouds.append(ProcessByInput._createPointCloud(points=points))
+            point_clouds.append(ProcessByInput.__createPointCloud(points=points))
             colors.append(color)
-        ProcessByInput._plot_point_clouds(
+        ProcessByInput.__plot_point_clouds(
             point_clouds=point_clouds, 
             row=2,
             col=int(np.ceil(length/2)), 
             colors=colors)
-        index = Input.get_int_input(max=length, print_str="Pick a cloud:\n")
+        index = Input.get_int_input(max=length, print_str="Pick a clustered cloud:\n> ")
         return clustered_points[index]
     
     @staticmethod
-    def _height(minValue: float, maxValue: float, point_clouds_points: list) -> tuple:
+    def __height(minValue: float, maxValue: float, point_clouds_points: list) -> tuple:
         option = Input.get_int_input(
             max=3, 
-            print_str="Select height option:\n[0] No height\n[1] Height division\n[2] Uniform max height\n")
+            print_str="Pick height option:\n[0] No height\n[1] Height division\n[2] Uniform max height\n> ")
         heights = [[minValue, maxValue]]
         if option == 1 or option == 2:
             heights = SliceByHeight.heights(minValue=minValue, maxValue=maxValue, divider=0.1)
@@ -113,7 +123,7 @@ class ProcessByInput():
         return heights, height_slices
     
     @staticmethod
-    def _point_cloud_to_lines(heights: list, height_slices: list) -> tuple:
+    def __point_cloud_to_lines(heights: list, height_slices: list) -> tuple:
         
         arguments = [
             {"distance_threshold" : [3, 2.25],  "angle_multiplier" : 1.25},
@@ -142,16 +152,16 @@ class ProcessByInput():
             lines_options.append(height_lines)
         
         length = len(lines_options)
-        ProcessByInput._plot_lines(
+        ProcessByInput.__plot_lines(
             lines_options=lines_options, 
             heights=heights,
             row=2,
             col=int(np.ceil(length/2)))
-        index = Input.get_int_input(max=length, print_str="Pick a line cloud:\n")
+        index = Input.get_int_input(max=length, print_str="Pick a line cloud:\n> ")
         return CreateFaces.lines_to_faces(heights, lines_options[index])
         
     @staticmethod
-    def _plot_point_clouds(point_clouds: list, row: int, col: int, colors=None) -> None:
+    def __plot_point_clouds(point_clouds: list, row: int, col: int, colors=None) -> None:
         figure = plt.figure(figsize=plt.figaspect(0.5))
         for r in range(row): 
             for c in range(col):
@@ -168,7 +178,7 @@ class ProcessByInput():
         plt.show()
         
     @staticmethod
-    def _plot_lines(lines_options: list, heights: list, row: int, col: int) -> None:
+    def __plot_lines(lines_options: list, heights: list, row: int, col: int) -> None:
         figure = plt.figure(figsize=plt.figaspect(0.5))
         for r in range(row): 
             for c in range(col):

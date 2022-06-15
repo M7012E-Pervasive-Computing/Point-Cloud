@@ -19,7 +19,7 @@ class Cluster():
         if debug:
             o3d.visualization.draw_geometries([point_cloud])
         
-        sorted_arr, rest_arr = Cluster._sort_on_labels(point_cloud)
+        sorted_arr, rest_arr = Cluster.__sort_on_labels(point_cloud)
         if min_points > 5 and len(rest_arr) > 0:
             point_cloud = o3d.geometry.PointCloud()
             point_cloud.points = o3d.utility.Vector3dVector(rest_arr) 
@@ -28,35 +28,35 @@ class Cluster():
         return sorted_arr
     
     @staticmethod
-    def _sort_on_labels(point_cloud):
+    def __sort_on_labels(point_cloud):
         all_colors = []
         pcd_colors = np.asarray(point_cloud.colors)
         pcd_arr = np.asarray(point_cloud.points)
         clusters = []
         unclustered = []
         for color in pcd_colors:
-            if (not Cluster._is_in(color, all_colors)):
+            if (not Cluster.__is_in(color, all_colors)):
                 all_colors.append(color)
         for color in all_colors:
             temp_arr = []
             for index in range(len(pcd_colors)):
                 if ((color == pcd_colors[index]).all()):
                     temp_arr.append(pcd_arr[index])
-            if (Cluster._is_black(color)):
+            if (Cluster.__is_black(color)):
                 unclustered.extend(temp_arr)
             else:
                 clusters.append(temp_arr)
         return clusters, unclustered
     
     @staticmethod
-    def _is_in(element, array):
+    def __is_in(element, array):
         for ind in array:
             if (element == ind).all():
                 return True
         return False
     
     @staticmethod  
-    def _is_black(color):
+    def __is_black(color):
         r, g, b = color
         if r == 0 and g == 0 and b == 0:
             return True

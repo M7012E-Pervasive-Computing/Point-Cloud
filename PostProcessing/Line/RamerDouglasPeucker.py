@@ -20,8 +20,8 @@ class RamerDouglasPeucker():
                 B = np.array(line[i])
                 C = np.array(line[(i+1) % length])
                 
-                angle = RamerDouglasPeucker._points_angle(A, B, C)
-                dist = RamerDouglasPeucker._point_line_distance(A, B, C)      
+                angle = RamerDouglasPeucker.__points_angle(A, B, C)
+                dist = RamerDouglasPeucker.__point_line_distance(A, B, C)      
                 dist = (dist * angle_multiplier) if angle >= 60 else dist
     
             
@@ -39,7 +39,7 @@ class RamerDouglasPeucker():
         return line 
     
     @staticmethod
-    def _points_angle(A, B, C):
+    def __points_angle(A, B, C):
         Ax, Ay = A[0]-B[0], A[1]-B[1]
         Cx, Cy = C[0]-B[0], C[1]-B[1]
         a = atan2(Ay, Ax)
@@ -50,5 +50,5 @@ class RamerDouglasPeucker():
         return degrees(angle)
       
     @staticmethod  
-    def _point_line_distance(A, B, C):
+    def __point_line_distance(A, B, C):
         return npl.norm(np.cross(C-A, A-B))/npl.norm(C-A)
