@@ -113,7 +113,7 @@ class ProcessByInput():
         return heights, height_slices
     
     @staticmethod
-    def _point_cloud_to_lines(heights: list, height_slices: list):
+    def _point_cloud_to_lines(heights: list, height_slices: list) -> tuple:
         
         arguments = [
             {"distance_threshold" : [3, 2.25],  "angle_multiplier" : 1.25},
@@ -148,7 +148,7 @@ class ProcessByInput():
             row=2,
             col=int(np.ceil(length/2)))
         index = Input.get_int_input(max=length, print_str="Pick a line cloud:\n")
-        return lines_options[index]
+        return CreateFaces.lines_to_faces(heights, lines_options[index])
         
     @staticmethod
     def _plot_point_clouds(point_clouds: list, row: int, col: int, colors=None) -> None:

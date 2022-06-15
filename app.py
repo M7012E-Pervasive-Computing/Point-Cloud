@@ -19,7 +19,9 @@ class App():
         min = pcd.get_min_bound()[2]
         max = pcd.get_max_bound()[2]
         heights, height_slices = ProcessByInput._height(min, max, cpcd)
-        ProcessByInput._point_cloud_to_lines(heights, height_slices)
+        vertices, faces = ProcessByInput._point_cloud_to_lines(heights, height_slices)
+        filename = input("Save file name:\n")
+        Export.faces(filename=filename, vertices=vertices, faces=faces)
         
         
         
