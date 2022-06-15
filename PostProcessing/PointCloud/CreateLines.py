@@ -1,10 +1,12 @@
 
 import numpy as np
+import warnings
 
 class CreateLines():
     
     @staticmethod
-    def point_clouds_to_lines(point_clouds):
+    def point_clouds_to_lines(point_clouds: list) -> list:
+        warnings.simplefilter('ignore', np.RankWarning)
         lines = []
         for point_cloud in point_clouds:
             x, y = [], []

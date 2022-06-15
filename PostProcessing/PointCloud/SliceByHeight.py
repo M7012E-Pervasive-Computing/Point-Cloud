@@ -3,21 +3,19 @@ import numpy as np
 class SliceByHeight():
     
     @staticmethod
-    def heights(point_cloud, divider):
-        minValue = point_cloud.get_min_bound()[2]
-        maxValue = point_cloud.get_max_bound()[2]
+    def heights(minValue: float, maxValue: float, divider: float) -> list:
         jump = (maxValue - minValue) * divider
         numberOfJumps = int(np.ceil((maxValue - minValue) / jump))
         return [[minValue + jump * i, maxValue - jump * (numberOfJumps - i - 1)] for i in range(numberOfJumps)]
     
     @staticmethod
-    def slice(point_clouds, heights):
+    def slice(point_clouds_points: list, heights: list) -> list:
         sorted_point_clouds = []
         for height in heights:
             height_point_clouds = []
-            for point_cloud in point_clouds:
+            for point_cloud_points in point_clouds_points:
                 height_point_cloud = []
-                for vertex in point_cloud:
+                for vertex in point_cloud_points:
                     if vertex[2] >= height[0] and vertex[2] <= height[1]:
                         height_point_cloud.append(vertex)
                 height_point_clouds.append(height_point_cloud)

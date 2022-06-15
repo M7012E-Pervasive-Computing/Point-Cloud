@@ -10,7 +10,7 @@ class RamerDouglasPeucker():
         return rdp(line, epsilon)
     
     @staticmethod
-    def rdp_angle(line, dist_threshold, angle_multiplier):
+    def rdp_angle(line, distance_threshold, angle_multiplier):
         length = len(line)
         while length >= 3:
             largestDiff = -np.inf
@@ -25,8 +25,8 @@ class RamerDouglasPeucker():
                 dist = (dist * angle_multiplier) if angle >= 60 else dist
     
             
-                if dist < dist_threshold: 
-                    diff = dist_threshold - dist
+                if dist < distance_threshold: 
+                    diff = distance_threshold - dist
                     if diff > largestDiff:
                         largestDiff = diff
                         idx = i

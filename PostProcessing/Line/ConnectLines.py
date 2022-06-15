@@ -4,7 +4,7 @@ import numpy as np
 class ConnectLines():
     
     @staticmethod
-    def connectLines(lines, distance_threshold): 
+    def connect(lines, distance_threshold): 
         lines = ConnectLines._sortLongest(lines)  
         connected_lines = [lines.pop(0)]
         has_reversed = False

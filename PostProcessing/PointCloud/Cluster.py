@@ -20,7 +20,7 @@ class Cluster():
             o3d.visualization.draw_geometries([point_cloud])
         
         sorted_arr, rest_arr = Cluster._sort_on_labels(point_cloud)
-        if min_points > 10 and len(rest_arr) > 0:
+        if min_points > 5 and len(rest_arr) > 0:
             point_cloud = o3d.geometry.PointCloud()
             point_cloud.points = o3d.utility.Vector3dVector(rest_arr) 
             sorted_rest = Cluster.clustering(point_cloud, eps, int(round(min_points/2)))

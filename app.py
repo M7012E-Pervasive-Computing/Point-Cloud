@@ -15,7 +15,12 @@ class App():
         points = Import.points(session_name=session_name)
         pcd = ProcessByInput._createPointCloud(points)
         pcd = ProcessByInput._denoise(pcd)
-        pcd = ProcessByInput._cluster(pcd)
+        cpcd = ProcessByInput._cluster(pcd)
+        min = pcd.get_min_bound()[2]
+        max = pcd.get_max_bound()[2]
+        heights, height_slices = ProcessByInput._height(min, max, cpcd)
+        ProcessByInput._point_cloud_to_lines(heights, height_slices)
+        
         
         
     @staticmethod
