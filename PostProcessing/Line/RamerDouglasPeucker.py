@@ -6,11 +6,31 @@ from rdp import rdp
 class RamerDouglasPeucker():
     
     @staticmethod
-    def rdp(line, epsilon=0.5):
+    def rdp(line: list, epsilon=0.5) -> list:
+        """Builtin Ramer-Douglas-Peucker.
+
+        Args:
+            line (list): Series of vertices as [x, y].
+            epsilon (float, optional): Epsilon for algorithm. Defaults to 0.5.
+
+        Returns:
+            list: Reduced line.
+        """
         return rdp(line, epsilon)
     
     @staticmethod
-    def rdp_angle(line, distance_threshold, angle_multiplier):
+    def rdp_angle(line: list, distance_threshold: float, angle_multiplier: float) -> list:
+        """Alteration of Ramer-Douglas-Peucker which takes angle into account.
+        
+
+        Args:
+            line (list): Series of vertices as [x, y].
+            distance_threshold (float): Distance between the line formed by adjacent vertices. 
+            angle_multiplier (float): Multiplier to strengthen desired angles.
+
+        Returns:
+            list: Reduced line.
+        """
         length = len(line)
         while length >= 3:
             largestDiff = -np.inf
@@ -39,7 +59,17 @@ class RamerDouglasPeucker():
         return line 
     
     @staticmethod
-    def __points_angle(A, B, C):
+    def __points_angle(A: np.ndarray, B: np.ndarray, C: np.ndarray) -> float:
+        """Get angle at point B.
+
+        Args:
+            A (np.ndarray): Point [x, y].
+            B (np.ndarray): Point [x, y].
+            C (np.ndarray): Point [x, y].
+
+        Returns:
+            float: angle at B.
+        """
         Ax, Ay = A[0]-B[0], A[1]-B[1]
         Cx, Cy = C[0]-B[0], C[1]-B[1]
         a = atan2(Ay, Ax)
@@ -50,5 +80,15 @@ class RamerDouglasPeucker():
         return degrees(angle)
       
     @staticmethod  
-    def __point_line_distance(A, B, C):
+    def __point_line_distance(A: np.ndarray, B: np.ndarray, C: np.ndarray) -> float:
+        """Get distance from point B to line formed between A and C.
+
+        Args:
+            A (np.ndarray): Point [x, y].
+            B (np.ndarray): Point [x, y].
+            C (np.ndarray): Point [x, y].
+
+        Returns:
+            float: Distance from B to line.
+        """
         return npl.norm(np.cross(C-A, A-B))/npl.norm(C-A)

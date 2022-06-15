@@ -10,6 +10,7 @@ class App():
     
     
     def __init__(self) -> None:
+        """App main functionality."""
         session_names = Import.names()
         session_name = App._select_session(session_names=session_names)
         points = Import.points(session_name=session_name)
@@ -18,10 +19,18 @@ class App():
         
     @staticmethod
     def _select_session(session_names: list) -> str:
-            sessions_str = 'Pick a session:\n> '
-            for i, session in enumerate(session_names):
-                sessions_str += f"[{i}] {session}\n"
-            session_idx = Input.get_int_input(len(session_names)-1, sessions_str)
-            return session_names[session_idx]  
+        """Generate a string for all session names and let user pick a session.
+
+        Args:
+            session_names (list): str of all session names.
+
+        Returns:
+            str: str of picked session.
+        """
+        sessions_str = 'Pick a session:\n> '
+        for i, session in enumerate(session_names):
+            sessions_str += f"[{i}] {session}\n"
+        session_idx = Input.get_int_input(len(session_names)-1, sessions_str)
+        return session_names[session_idx]  
         
 App()

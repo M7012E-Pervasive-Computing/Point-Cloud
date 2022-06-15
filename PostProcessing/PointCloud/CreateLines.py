@@ -1,11 +1,21 @@
 
 import numpy as np
 import warnings
+import matplotlib.pyplot as plt
 
 class CreateLines():
     
     @staticmethod
-    def point_clouds_to_lines(point_clouds: list) -> list:
+    def point_clouds_to_lines(point_clouds: list, debug=False) -> list:
+        """Converts list of point cloud points into separate lines. 
+
+        Args:
+            point_clouds (list): [[[x,y,z], ...], ...].
+            debug (bool, optional): Debug visualization. Defaults to False.
+
+        Returns:
+            list: All lines as a series of [x, y].
+        """
         warnings.simplefilter('ignore', np.RankWarning)
         lines = []
         for point_cloud in point_clouds:
@@ -30,8 +40,10 @@ class CreateLines():
             y1 = a*x1 + b
             y2 = a*x2 + b
             
-            # plt.plot(x, y, 'o')
-            # plt.plot(x, (a*x + b))
+            if debug:
+                plt.plot(x, y, 'o')
+                plt.plot(x, (a*x + b))
             lines.append([[x1, y1], [x2, y2]])
-        # plt.show()
+        if debug:
+            plt.show()
         return lines

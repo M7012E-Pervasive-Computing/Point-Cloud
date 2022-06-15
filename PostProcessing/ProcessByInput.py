@@ -21,6 +21,14 @@ class ProcessByInput():
     
     @staticmethod
     def apply_post_input_processing(points: list) -> tuple:
+        """Apply all input based post processing.
+
+        Args:
+            points (list): list of points as [x, y, z].
+
+        Returns:
+            tuple: all vertices as [x, y, z] and faces as list of vertex indices.
+        """
         point_cloud = ProcessByInput.__createPointCloud(points=points)
         point_cloud = ProcessByInput.__denoise(point_cloud=point_cloud)
         clustered_points = ProcessByInput.__cluster(point_cloud=point_cloud)
@@ -31,6 +39,15 @@ class ProcessByInput():
     
     @staticmethod
     def __createPointCloud(points: list, debug=False) -> o3d.geometry.PointCloud:
+        """Create a open3d point cloud.
+
+        Args:
+            points (list): All points as [x, y, z].
+            debug (bool, optional): For debug visualization. Defaults to False.
+
+        Returns:
+            o3d.geometry.PointCloud: Point cloud.
+        """
         point_cloud = o3d.geometry.PointCloud()
         point_cloud.points = o3d.utility.Vector3dVector(points)
         point_cloud.paint_uniform_color([0, 0, 0])
@@ -40,6 +57,14 @@ class ProcessByInput():
     
     @staticmethod
     def __denoise(point_cloud: o3d.geometry.PointCloud) -> o3d.geometry.PointCloud:
+        """Denoise a open3d point cloud.
+
+        Args:
+            point_cloud (o3d.geometry.PointCloud): Point cloud to denoise.
+
+        Returns:
+            o3d.geometry.PointCloud: Resulting point cloud.
+        """
         arguments = [
             {"ratio" : [0.05, 0.05],    "neighbors" : [150, 50],    "voxel_size" : 0.5},
             {"ratio" : [0.05, 0.05],    "neighbors" : [75, 25],     "voxel_size" : 0.5},
@@ -73,6 +98,14 @@ class ProcessByInput():
     
     @staticmethod
     def __cluster(point_cloud: o3d.geometry.PointCloud) -> list:
+        """Cluster open3d point cloud.
+
+        Args:
+            point_cloud (o3d.geometry.PointCloud): Point cloud to cluster.
+
+        Returns:
+            list: All clusters as list of [x, y, z].
+        """
         arguments = [
             {"eps" : 1,     "min_points" : 75},
             {"eps" : 0.8,   "min_points" : 75},
@@ -111,6 +144,16 @@ class ProcessByInput():
     
     @staticmethod
     def __height(minValue: float, maxValue: float, point_clouds_points: list) -> tuple:
+        """Slice a list of list containing points.
+
+        Args:
+            minValue (float): Min height (z axis).
+            maxValue (float): Max height (z axis).
+            point_clouds_points (list): List of list containing points as [x, y, z].
+
+        Returns:
+            tuple: heights and sliced points by height.
+        """
         option = Input.get_int_input(
             max=3, 
             print_str="Pick height option:\n[0] No height\n[1] Height division\n[2] Uniform max height\n> ")
@@ -124,7 +167,15 @@ class ProcessByInput():
     
     @staticmethod
     def __point_cloud_to_lines(heights: list, height_slices: list) -> tuple:
-        
+        """Turn a sliced list of points into lines.
+
+        Args:
+            heights (list): Heights levels for points.
+            height_slices (list): >liced clusters of points by heights.
+
+        Returns:
+            tuple: all vertices as [x, y, z] and faces as list of vertex indices.
+        """
         arguments = [
             {"distance_threshold" : [3, 2.25],  "angle_multiplier" : 1.25},
             {"distance_threshold" : [3, 0],     "angle_multiplier" : 1.25},
@@ -162,6 +213,14 @@ class ProcessByInput():
         
     @staticmethod
     def __plot_point_clouds(point_clouds: list, row: int, col: int, colors=None) -> None:
+        """Plot a list of point clouds.
+
+        Args:
+            point_clouds (list): List of point clouds.
+            row (int): Number of row plots.
+            col (int): Number of column plots.
+            colors (list, optional): Color setting of each plot. Defaults to None.
+        """
         figure = plt.figure(figsize=plt.figaspect(0.5))
         for r in range(row): 
             for c in range(col):
@@ -179,11 +238,20 @@ class ProcessByInput():
         
     @staticmethod
     def __plot_lines(lines_options: list, heights: list, row: int, col: int) -> None:
+        """Plot a list of list of lines.
+
+        Args:
+            lines_options (list): List of options for lines.
+            heights (list): Heights for all lines.
+            row (int): Number of row plots.
+            col (int): Number of column plots.
+        """
         figure = plt.figure(figsize=plt.figaspect(0.5))
         for r in range(row): 
             for c in range(col):
                 index = r*col+c
                 ax = figure.add_subplot(row, col, index+1, projection='3d')
+                ax.set_title(f"{index}")
                 line_option = lines_options[index] 
                 for i, lines_per_height in enumerate(line_option):
                     for line in lines_per_height:

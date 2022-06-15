@@ -2,7 +2,16 @@
 class CreateFaces():
     
     @staticmethod
-    def lines_to_faces(heights, height_lines):
+    def lines_to_faces(heights: list, height_lines: list) -> tuple:
+        """Creates faces from lines using the heights.
+
+        Args:
+            heights (list): All heights in series of [min, max].
+            height_lines (list): All lines per height.
+
+        Returns:
+            tuple: all vertices as [x, y, z] and faces as list of vertex indices.
+        """
         vertices = []
         faces = []
         for height_idx, lines in enumerate(height_lines, start=0):

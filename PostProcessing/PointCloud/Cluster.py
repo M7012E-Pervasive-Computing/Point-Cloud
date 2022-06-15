@@ -6,11 +6,21 @@ import matplotlib.pyplot as plt
 class Cluster():
     
     @staticmethod
-    def clustering(point_cloud, eps, min_points, debug=False):
+    def clustering(point_cloud: o3d.geometry.PointCloud, eps: float, min_points: int, debug=False) -> list:
+        """Cluster points from point cloud recursively.
+
+        Args:
+            point_cloud (o3d.geometry.PointCloud): Point cloud to cluster.
+            eps (float): Eps used by dbscan.
+            min_points (int): Min points for cluster in dbscan.
+            debug (bool, optional): To visualize debug plots. Defaults to False.
+
+        Returns:
+            list: All clusters as a list of points.
+        """
         labels = np.array(point_cloud.cluster_dbscan(eps=eps, min_points=min_points, print_progress=False))
 
         max_label = np.max(labels)
-        # print(f"point cloud has {max_label + 1} clusters")
 
         colors = plt.get_cmap("tab20")(labels / (max_label if max_label > 0 else 1))
         colors[labels < 0] = 0
@@ -28,7 +38,15 @@ class Cluster():
         return sorted_arr
     
     @staticmethod
-    def __sort_on_labels(point_cloud):
+    def __sort_on_labels(point_cloud: o3d.geometry.PointCloud) -> tuple:
+        """Sort labeled clusters into list of points.
+
+        Args:
+            point_cloud (o3d.geometry.PointCloud): Clustered point cloud.
+
+        Returns:
+            tuple: All clusters as list of points and unclustered points as a list. 
+        """
         all_colors = []
         pcd_colors = np.asarray(point_cloud.colors)
         pcd_arr = np.asarray(point_cloud.points)
@@ -49,14 +67,31 @@ class Cluster():
         return clusters, unclustered
     
     @staticmethod
-    def __is_in(element, array):
+    def __is_in(element: any, array: list) -> bool:
+        """Checks if element is in list.
+
+        Args:
+            element (any): element which can be in list.
+            array (list): The list of elements.
+
+        Returns:
+            bool: True if is in list array.
+        """
         for ind in array:
             if (element == ind).all():
                 return True
         return False
     
     @staticmethod  
-    def __is_black(color):
+    def __is_black(color: np.ndarray) -> bool:
+        """Check if color is black.
+
+        Args:
+            color (np.ndarray): color.
+
+        Returns:
+            bool: True if color is black.
+        """
         r, g, b = color
         if r == 0 and g == 0 and b == 0:
             return True
