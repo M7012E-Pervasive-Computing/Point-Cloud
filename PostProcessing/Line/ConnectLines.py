@@ -47,6 +47,16 @@ class ConnectLines():
                 connected_lines[-1].extend(best)
                 lines.pop(idx)
                 has_reversed = False
+        
+        # Connect the first and last node forming a cycle if possible
+        for line in connected_lines:
+            if len(line) >= 3:
+                distance = ConnectLines.__distance_points(line[0], line[-1])
+                if distance < distance_threshold:
+                    line.append(line[0])
+            else:
+                continue
+        
         return connected_lines
     
     @staticmethod

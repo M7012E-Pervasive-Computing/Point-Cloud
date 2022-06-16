@@ -54,7 +54,8 @@ class RamerDouglasPeucker():
             if idx is None: 
                 return line
             else:
-                line.pop(idx)
+                if not(idx == length-1 and line[0] == line[-1]):
+                    line.pop(idx)
                 length -= 1
         return line 
     
