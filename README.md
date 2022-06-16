@@ -1,10 +1,10 @@
 # Point-Cloud
 
-A Python program used for the visualization of a certain point cloud, both using PyVista and Open3d libraries.
+A Python program used for the visualization and post processing of  point clouds.
 
 ## Description
 
-This Python program has been created to receive 3-dimensional coordinates coming from a server, build up the respective point cloud and then visualize it both with the PyVista and Open3d library. Apart from that, there is an optimization tool based on point cloud density used to improve the result of the graphical model.
+This Python program has been created to receive 3-dimensional coordinates coming from a server, build up the respective point cloud and then visualize it. Apart from that, there are plenty of post processing methods that can be applied to the point cloud to improve result. There is also a export to wavefront obj file, to be visualized in another program. 
 
 ## Getting Started
 
