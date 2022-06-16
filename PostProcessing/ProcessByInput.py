@@ -1,5 +1,4 @@
 
-from ast import arguments
 import open3d as o3d
 import copy
 import numpy as np
@@ -171,7 +170,7 @@ class ProcessByInput():
 
         Args:
             heights (list): Heights levels for points.
-            height_slices (list): >liced clusters of points by heights.
+            height_slices (list): sliced clusters of points by heights.
 
         Returns:
             tuple: all vertices as [x, y, z] and faces as list of vertex indices.

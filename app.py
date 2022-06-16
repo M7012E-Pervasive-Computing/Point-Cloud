@@ -3,6 +3,7 @@ from Import.ImportSession import ImportSession as Import
 from Export.ExportObj import ExportObj as Export
 
 from PostProcessing.ProcessByInput import ProcessByInput
+from PostProcessing.ProcessBySetting import ProcessBySetting
 
 from Helper.Input import Input
 
@@ -14,7 +15,13 @@ class App():
         session_names = Import.names()
         session_name = App._select_session(session_names=session_names)
         points = Import.points(session_name=session_name)
-        vertices, faces = ProcessByInput.apply_post_input_processing(points=points)
+        vertices = []
+        faces = []
+        option = Input.get_int_input(1, "[0] Process by input\n[1] Process by setting\n> ")
+        if option == 0:
+            vertices, faces = ProcessByInput.apply_post_input_processing(points=points)
+        else: 
+            vertices, faces = ProcessBySetting.apply_post_setting_processing(points=points)
         Export.faces(filename=input("filename?\n> "), vertices=vertices, faces=faces)
         
     @staticmethod
