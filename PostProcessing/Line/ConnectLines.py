@@ -14,6 +14,8 @@ class ConnectLines():
         Returns:
             list: List of lines where the lines have connected if possible. 
         """
+        if len(lines) < 0:
+            return []
         lines = ConnectLines.__sort_longest(lines)  
         connected_lines = [lines.pop(0)]
         has_reversed = False
