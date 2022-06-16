@@ -20,6 +20,8 @@ class Input():
                     print('Not a valid index')
                     continue
                 break
+            except KeyboardInterrupt:
+                exit()
             except ValueError:
                 print('Not a valid input')
         return result

@@ -61,6 +61,8 @@ class ProcessBySetting():
                 if (input("Redo denoise (y/n)?:\n> ") != "y"):
                     point_cloud = cloud
                     break
+            except KeyboardInterrupt:
+                exit()
             except:
                 print("Bad input")
                 continue
@@ -77,6 +79,8 @@ class ProcessBySetting():
                 if (input("Redo voxel down (y/n)?:\n> ") != "y"):
                     point_cloud = cloud
                     break
+            except KeyboardInterrupt:
+                exit()
             except:
                 print("Bad input")
                 continue
@@ -94,6 +98,8 @@ class ProcessBySetting():
                 ProcessBySetting.__plot_point_cloud(cloud)
                 if (input("Redo denoise (y/n)?:\n> ") != "y"):
                     return cloud
+            except KeyboardInterrupt:
+                exit()
             except:
                 print("Bad input")
                 continue
@@ -129,6 +135,8 @@ class ProcessBySetting():
                     colors=colors)
                 if (input("Redo clustering (y/n)?:\n> ") != "y"):
                     return clusters
+            except KeyboardInterrupt:
+                exit()
             except:
                 print("Bad input")
                 continue
@@ -199,6 +207,8 @@ class ProcessBySetting():
                     return CreateFaces.lines_to_faces(
                         heights=heights, 
                         height_lines=height_lines)
+            except KeyboardInterrupt:
+                exit()
             except:
                 print("Bad input")
                 continue

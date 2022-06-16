@@ -34,9 +34,10 @@ class App():
         Returns:
             str: str of picked session.
         """
-        sessions_str = 'Pick a session:\n> '
+        sessions_str = 'Pick a session:\n'
         for i, session in enumerate(session_names):
             sessions_str += f"[{i}] {session}\n"
+        sessions_str += "> "
         session_idx = Input.get_int_input(len(session_names)-1, sessions_str)
         return session_names[session_idx]  
         
