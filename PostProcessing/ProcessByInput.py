@@ -47,6 +47,7 @@ class ProcessByInput():
         Returns:
             o3d.geometry.PointCloud: Resulting point cloud.
         """
+        print("Denoise point cloud:")
         arguments = [
             {"ratio" : [0.05, 0.05],    "neighbors" : [150, 50],    "voxel_size" : 0.5},
             {"ratio" : [0.05, 0.05],    "neighbors" : [75, 25],     "voxel_size" : 0.5},
@@ -88,6 +89,7 @@ class ProcessByInput():
         Returns:
             list: All clusters as list of [x, y, z].
         """
+        print("Cluster point cloud:")
         arguments = [
             {"eps" : 1,     "min_points" : 75},
             {"eps" : 0.8,   "min_points" : 75},
@@ -158,6 +160,7 @@ class ProcessByInput():
         Returns:
             tuple: all vertices as [x, y, z] and faces as list of vertex indices.
         """
+        print("Point cloud to lines:")
         arguments = [
             {"distance_threshold" : [3, 2.25],  "angle_multiplier" : 1.25},
             {"distance_threshold" : [3, 0],     "angle_multiplier" : 1.25},

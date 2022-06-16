@@ -19,7 +19,7 @@ class DenoiseOutlier():
         _, index = point_cloud.remove_statistical_outlier(
             nb_neighbors=neighbors, 
             std_ratio=ratio, 
-            print_progress=debug)
+            print_progress=False)
         
         inliers = point_cloud.select_by_index(index)
         outlier = point_cloud.select_by_index(index, invert=True)
@@ -48,7 +48,7 @@ class DenoiseOutlier():
         _, index = point_cloud.remove_radius_outlier(
             nb_points=neighbors, 
             radius=radius, 
-            print_progress=debug)
+            print_progress=False)
 
         inliers = point_cloud.select_by_index(index)
         outlier = point_cloud.select_by_index(index, invert=True)

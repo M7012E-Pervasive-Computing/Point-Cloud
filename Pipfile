@@ -8,6 +8,8 @@ numpy = "*"
 vtk = "*"
 open3d = "==0.14.1"
 requests = "*"
+matplotlib = "*"
+rdp = "*"
 
 [dev-packages]
 
