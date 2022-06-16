@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from Helper.Input import Input
+from Helper.CreatePointCloud import CreatePointCloud
 
 from PostProcessing.PointCloud.DenoiseOutlier import DenoiseOutlier as Denoise
 from PostProcessing.PointCloud.Downsampling import Downsampling
@@ -28,31 +29,13 @@ class ProcessByInput():
         Returns:
             tuple: all vertices as [x, y, z] and faces as list of vertex indices.
         """
-        point_cloud = ProcessByInput.__createPointCloud(points=points)
+        point_cloud = CreatePointCloud.open3d(points=points)
         point_cloud = ProcessByInput.__denoise(point_cloud=point_cloud)
         clustered_points = ProcessByInput.__cluster(point_cloud=point_cloud)
         min = point_cloud.get_min_bound()[2]
         max = point_cloud.get_max_bound()[2]
         heights, height_slices = ProcessByInput.__height(minValue=min, maxValue=max, point_clouds_points=clustered_points)
         return ProcessByInput.__point_cloud_to_lines(heights=heights, height_slices=height_slices)
-    
-    @staticmethod
-    def __createPointCloud(points: list, debug=False) -> o3d.geometry.PointCloud:
-        """Create a open3d point cloud.
-
-        Args:
-            points (list): All points as [x, y, z].
-            debug (bool, optional): For debug visualization. Defaults to False.
-
-        Returns:
-            o3d.geometry.PointCloud: Point cloud.
-        """
-        point_cloud = o3d.geometry.PointCloud()
-        point_cloud.points = o3d.utility.Vector3dVector(points)
-        point_cloud.paint_uniform_color([0, 0, 0])
-        if debug:
-            o3d.visualization.draw_geometries([point_cloud])  
-        return point_cloud  
     
     @staticmethod
     def __denoise(point_cloud: o3d.geometry.PointCloud) -> o3d.geometry.PointCloud:
@@ -131,7 +114,7 @@ class ProcessByInput():
             for i, cluster in enumerate(clusters):
                 points.extend(cluster)
                 color.extend([i for _ in range(len(cluster))])
-            point_clouds.append(ProcessByInput.__createPointCloud(points=points))
+            point_clouds.append(CreatePointCloud.open3d(points=points))
             colors.append(color)
         ProcessByInput.__plot_point_clouds(
             point_clouds=point_clouds, 
