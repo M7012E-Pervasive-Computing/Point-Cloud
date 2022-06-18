@@ -34,8 +34,9 @@ class ProcessByInput():
         clustered_points = ProcessByInput.__cluster(point_cloud=point_cloud)
         min = point_cloud.get_min_bound()[2]
         max = point_cloud.get_max_bound()[2]
-        heights, height_slices = ProcessByInput.__height(minValue=min, maxValue=max, point_clouds_points=clustered_points)
-        return ProcessByInput.__point_cloud_to_lines(heights=heights, height_slices=height_slices)
+        uniform, heights, height_slices = ProcessByInput.__height(minValue=min, maxValue=max, point_clouds_points=clustered_points)
+        lines = ProcessByInput.__point_cloud_to_lines(heights=heights, height_slices=height_slices)
+        return CreateFaces.lines_to_faces([[min, max] for _ in heights] if uniform else heights, lines)
     
     @staticmethod
     def __denoise(point_cloud: o3d.geometry.PointCloud) -> o3d.geometry.PointCloud:
@@ -142,23 +143,23 @@ class ProcessByInput():
             max=3, 
             print_str="Pick height option:\n[0] No height\n[1] Height division\n[2] Uniform max height\n> ")
         heights = [[minValue, maxValue]]
+        uniform = option == 2
         if option == 1 or option == 2:
             heights = SliceByHeight.heights(minValue=minValue, maxValue=maxValue, divider=0.1)
-            heights = [[minValue, maxValue] for _ in heights] if option == 2 else heights
             
         height_slices = SliceByHeight.slice(point_clouds_points=point_clouds_points, heights=heights)
-        return heights, height_slices
+        return uniform, heights, height_slices
     
     @staticmethod
-    def __point_cloud_to_lines(heights: list, height_slices: list) -> tuple:
+    def __point_cloud_to_lines(heights: list, height_slices: list) -> list:
         """Turn a sliced list of points into lines.
 
         Args:
             heights (list): Heights levels for points.
-            height_slices (list): sliced clusters of points by heights.
+            height_slices (list): Sliced clusters of points by heights.
 
         Returns:
-            tuple: all vertices as [x, y, z] and faces as list of vertex indices.
+            list: All lines
         """
         print("Point cloud to lines:")
         arguments = [
@@ -194,7 +195,7 @@ class ProcessByInput():
             row=2,
             col=int(np.ceil(length/2)))
         index = Input.get_int_input(max=length, print_str="Pick a line cloud:\n> ")
-        return CreateFaces.lines_to_faces(heights, lines_options[index])
+        return lines_options[index]
         
     @staticmethod
     def __plot_point_clouds(point_clouds: list, row: int, col: int, colors=None) -> None:

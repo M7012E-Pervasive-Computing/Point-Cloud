@@ -33,9 +33,10 @@ class ProcessBySetting():
         clustered_points = ProcessBySetting.__cluster(point_cloud=point_cloud)
         min = point_cloud.get_min_bound()[2]
         max = point_cloud.get_max_bound()[2]
-        heights, height_slices = ProcessBySetting.__height(
+        uniform, heights, height_slices = ProcessBySetting.__height(
             minValue=min, maxValue=max, point_clouds_points=clustered_points)
-        return ProcessBySetting.__point_cloud_to_lines(heights=heights, height_slices=height_slices)
+        lines = ProcessBySetting.__point_cloud_to_lines(heights=heights, height_slices=height_slices)
+        return CreateFaces.lines_to_faces([[min, max] for _ in heights] if uniform else heights, lines)
 
     @staticmethod
     def __denoise(point_cloud: o3d.geometry.PointCloud) -> o3d.geometry.PointCloud:
@@ -157,15 +158,14 @@ class ProcessBySetting():
             max=3,
             print_str="Pick height option:\n[0] No height\n[1] Height division\n[2] Uniform max height\n> ")
         heights = [[minValue, maxValue]]
+        uniform = option == 2
         if option == 1 or option == 2:
             heights = SliceByHeight.heights(
                 minValue=minValue, maxValue=maxValue, divider=0.1)
-            heights = [[minValue, maxValue]
-                       for _ in heights] if option == 2 else heights
 
         height_slices = SliceByHeight.slice(
             point_clouds_points=point_clouds_points, heights=heights)
-        return heights, height_slices
+        return uniform, heights, height_slices
 
     @staticmethod
     def __point_cloud_to_lines(heights: list, height_slices: list) -> tuple:
@@ -204,9 +204,7 @@ class ProcessBySetting():
                     heights=heights)
 
                 if (input("Redo lines (y/n)?:\n> ") != "y"):
-                    return CreateFaces.lines_to_faces(
-                        heights=heights, 
-                        height_lines=height_lines)
+                    return height_lines
             except KeyboardInterrupt:
                 exit()
             except:
