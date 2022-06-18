@@ -32,6 +32,6 @@ class ImportSession():
         request = requests.get('http://130.240.202.87:3000/' + session_name)
         points = json.loads(request.text)['points']
         points = [[point['y'], point['x'], point['z']] for point in points]
-        print(f"Successfully imported points from session: {session_name}")
+        print(f"Successfully imported points from session: {session_name}, with {len(points)} number of points")
         return points
     
